@@ -27,4 +27,3 @@ SIMULATOR_INTERFACE=csapp.h csapp.c scanner.h scanner.l gdb_protocol.h gdb_proto
 ARM_runner_example_SOURCES=$(COMMON) $(SIMULATOR_INTERFACE) ARM_runner_example.c
 
 EXTRA_DIST+=sample_run.sh
-
