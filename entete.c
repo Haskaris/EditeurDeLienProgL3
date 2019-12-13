@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < 16; i++)
           printf("%02x ",header.e_ident[i]);
 
-        printf("\n  Classe:\t");
+        printf("\n  Classe:\t\t\t\t");
         switch (header.e_ident[EI_CLASS]) {
           case ELFCLASS32:
             printf("ELF32");
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
             printf("Invalide");
         }
 
-        printf("\n  Données:\t");
+        printf("\n  Données:\t\t\t\t");
         switch (header.e_ident[EI_DATA]) {
           case ELFDATA2LSB:
             printf("Complément à deux, petit boutien (little endians)");
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
             printf("Invalide");
         }
 
-        printf("\n  Version:\t");
+        printf("\n  Version:\t\t\t\t");
         switch (header.e_ident[EI_VERSION]) {
           case EV_CURRENT:
             printf("1 (current)");
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
             printf("Invalide");
         }
 
-        printf("\n  OS/ABI:\t");
+        printf("\n  OS/ABI:\t\t\t\t");
         switch (header.e_ident[EI_OSABI]) {
           case ELFOSABI_HPUX:
             printf("HP-UX");
@@ -92,16 +92,16 @@ int main(int argc, char *argv[]) {
           default://ELFOSABI_NONE ou ELFOSABI_SYSV
             printf("UNIX System V");
         }
-        printf("\n  Version ABI:\t0x%01x",header.e_ident[EI_ABIVERSION]);
-        printf("\n  Adresse du point d'entrée:\t0x%01x", header.e_ident[EI_PAD]);
+        printf("\n  Version ABI:\t\t\t\t0x%01x",header.e_ident[EI_ABIVERSION]);
+        printf("\n  Adresse du point d'entrée:\t\t0x%01x", header.e_ident[EI_PAD]);
         printf("\n  Début des en-tête de programme:\t%lu", header.e_phoff);
-        printf("\n  Début des en-tête de section:\t%lu", header.e_shoff);
-        printf("\n  Fanions:\t0x%01x", header.e_flags);
-        printf("\n  Taille de cet en-tête:\t%d (octets)", header.e_ehsize);
+        printf("\n  Début des en-tête de section:\t\t%lu", header.e_shoff);
+        printf("\n  Fanions:\t\t\t\t0x%01x", header.e_flags);
+        printf("\n  Taille de cet en-tête:\t\t%d (octets)", header.e_ehsize);
         printf("\n  Taille de l'en-tête du programme:\t%d (octets)", header.e_phentsize);
         printf("\n  Nombre d'en-tête du programme:\t%d", header.e_phnum);
         printf("\n  Taille des en-têtes de section:\t%d (octets)", header.e_shentsize);
-        printf("\n  Nombre d'en-têtes de section:\t%d", header.e_shnum);
+        printf("\n  Nombre d'en-têtes de section:\t\t%d", header.e_shnum);
         printf("\n  Table d'indexes des chaînes d'en-tête de section:\t%d\n", header.e_shstrndx);
       }
       fclose(elfFile);
