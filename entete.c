@@ -9,8 +9,9 @@ int main(int argc, char *argv[]) {
   Elf64_Ehdr header;
 
   char buff[255];
-  if (argc == 1) {
-    printf("Tu l'utilises pas comme ça.\n");
+  if (argc != 2) {
+    printf("Utilisation : %s <ELF_FILE>\n", argv[0]);
+    exit(1);
   }
   else {
     elfFile = fopen(argv[1], "r");
