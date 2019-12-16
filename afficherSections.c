@@ -4,13 +4,28 @@
 #include <elf.h>
 #include <assert.h>
 
+void get_section_name(FILE* elfFile, Elf64_Ehdr header, Elf64_Shdr section, char* name){
+    Elf64_Shdr table_chaine;
+    fseek(elfFile,header.e_shoff+header.e_shstrndx*sizeof(section),SEEK_SET);
+    fread(&table_chaine, 1, sizeof(section), elfFile);
+    fseek(elfFile,table_chaine.sh_offset+section.sh_name,SEEK_SET);
+    char c=fgetc(elfFile);
+    int i=0;
+    while(c!='\0'){
+        name[i]=c;
+        i++;
+        c=fgetc(elfFile);
+    }
+    name[i]='\0';
+}
+
 int main(int argc, char *argv[]) {
   FILE * elfFile;
 
   Elf64_Ehdr header;
   Elf64_Shdr section;
 
-	char* tableName = NULL;
+	char tableName[255];
 
   char buff[255];
   if (argc != 3) {
@@ -43,9 +58,13 @@ int main(int argc, char *argv[]) {
 					fseek(elfFile, header.e_shoff + i * sizeof(section), SEEK_SET);
           fread(&section, 1, sizeof(section), elfFile);
 
+          get_section_name(elfFile, header, section, tableName);
+
+          printf("Vidange hexadécimale de la section << %s >> :\n", tableName);
+
           for(int j = 0; j < section.sh_size; j+=16) {
             fseek(elfFile,section.sh_offset+j,SEEK_SET);
-            printf("0x%08x ", j);
+            printf("  0x%08x ", j);
             for (int k = 0; k < 16; k++){
              unsigned char c;
              fscanf(elfFile,"%c",&c);
