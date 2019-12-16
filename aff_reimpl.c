@@ -53,8 +53,18 @@ int main(int argc, char *argv[]) {
           fseek(elfFile, header.e_shoff + i * sizeof(section), SEEK_SET);
           fread(&section, 1, sizeof(section), elfFile);
           if(section.sh_type==SHT_RELA){
+              Elf64_Rela rela;
               get_section_name(elfFile,header,section,nom_section);
-              printf("%s\n",nom_section);
+              int nb_entree=(int)section.sh_size/sizeof(Elf64_Rela);
+              printf("Section de réadressage '%s' à l'adresse de décalage 0x%04lx contient %d entrées\n",nom_section,section.sh_offset,nb_entree);
+              fseek(elfFile,section.sh_offset,SEEK_SET);
+              for (int i=0;i<nb_entree;i++){
+                  fread(&rela,1,sizeof(rela),elfFile);
+                  printf("décalage : %012lx  ",rela.r_offset);
+                  printf("type : %lu  ",ELF64_R_TYPE(rela.r_info));
+                  printf("index : %lu \n",ELF64_R_SYM(rela.r_info));
+              }
+              printf("\n");
           }
 
         }
