@@ -2,31 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-
-static inline Elf64_Shdr *elf_sheader(Elf64_Ehdr *hdr) {
-	return (Elf64_Shdr *)((int)hdr + hdr->e_shoff);
-}
-
-static inline Elf64_Shdr *elf_section(Elf64_Ehdr *hdr, int idx) {
-	return &elf_sheader(hdr)[idx];
-}
-
-static inline char *elf_str_table(Elf64_Ehdr *hdr) {
-	if(hdr->e_shstrndx == SHN_UNDEF) return NULL;
-	return (char *)hdr + elf_section(hdr, hdr->e_shstrndx)->sh_offset;
-}
-
-static inline char *elf_lookup_string(Elf64_Ehdr *hdr, int offset) {
-	char *strtab = elf_str_table(hdr);
-	if(strtab == NULL) return NULL;
-	return strtab + offset;
-}
+#include <assert.h>
 
 int main(int argc, char *argv[]) {
   FILE * elfFile;
 
   Elf64_Ehdr header;
   Elf64_Shdr section;
+
+	char* tableName = NULL;
 
   char buff[255];
   if (argc != 3) {
@@ -56,12 +40,9 @@ int main(int argc, char *argv[]) {
         }
 
         if (i <= header.e_shnum) {
-          fseek(elfFile, header.e_shoff + i * sizeof(section), SEEK_SET);
+					fseek(elfFile, header.e_shoff + i * sizeof(section), SEEK_SET);
           fread(&section, 1, sizeof(section), elfFile);
-          //
-          // char *strName = elf_lookup_string(&header, i * sizeof(section));
-          // printf("OUI\n");
-          // printf("%s\n", strName);
+
           for(int j = 0; j < section.sh_size; j+=16) {
             fseek(elfFile,section.sh_offset+j,SEEK_SET);
             printf("0x%08x ", j);
@@ -84,7 +65,8 @@ int main(int argc, char *argv[]) {
             printf("\n");
           }
         }
-        else printf("Numéro de section inexistante.\n");
+        else {
+					printf("Numéro de section inexistante.\n");}
       }
       fclose(elfFile);
     }
