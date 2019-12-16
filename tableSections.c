@@ -30,18 +30,18 @@ int main(int argc, char *argv[]) {
         //fread(SectNames, 1, sectHdr.sh_size, ElfFile);
 
         // read all section headers
-        for (int i = 0; i < header.e_shnum; i++)
-          {
-          const char* name = "";
+        int i = 0;
 
+        while (i <= header.e_shnum && i < atoi(argv[1])) {
+          i++;
+        }
+
+        if (i <= header.e_shnum) {
           fseek(elfFile, header.e_shoff + i * sizeof(section), SEEK_SET);
           fread(&section, 1, sizeof(section), elfFile);
-
-          // print section name
-          //if (sectHdr.sh_name);
-          //  name = SectNames + sectHdr.sh_name;
-          printf("%2u %s\n", i, section.sh_name);
+          printf("%2u %d\n", i, section.sh_name);
         }
+        else printf("Numéro de section inexistante.\n")
       }
       fclose(elfFile);
     }
