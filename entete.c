@@ -3,10 +3,32 @@
 #include <string.h>
 #include <elf.h>
 
+int isbigendian(){
+    return 1;
+}
+
+uint16_t byteshift16(uint16_t n){
+    if (isbigendian()){
+        return ((n>>8)&0xff) | ((n<<8)&0xff00);
+    }
+    else{
+        return n;
+    }
+}
+
+uint32_t byteshift32(uint32_t n) {
+    if (isbigendian()){
+          return ((n>>24)&0xff) | ((n<<8)&0xff0000) | ((n>>8)&0xff00) | ((n<<24)&0xff000000);
+    }
+    else{
+        return n;
+    }
+}
+
 int main(int argc, char *argv[]) {
   FILE * elfFile;
 
-  Elf64_Ehdr header;
+  Elf32_Ehdr header;
 
   char buff[255];
   if (argc == 1) {
@@ -18,15 +40,22 @@ int main(int argc, char *argv[]) {
       printf("Erreur d'ouverture du fichier.\n");
     }
     else {
-      // read the header
-      fread(&header, 1, sizeof(header), elfFile);
+      unsigned char c=fgetc(elfFile);
+      for (int i=0;i<52;i++){
+          printf("%02x ",c);
+          c=fgetc(elfFile);
+      }
+      printf("\n");
 
+      fseek(elfFile,0,SEEK_SET);
+      // read the header
+      fread(&header, sizeof(header), 1,elfFile);
       // check so its really an elf file
       if (memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
+
         printf("En-tête ELF:\n  Magique:\t");
         for (int i = 0; i < 16; i++)
           printf("%02x ",header.e_ident[i]);
-
         printf("\n  Classe:\t\t\t\t");
         switch (header.e_ident[EI_CLASS]) {
           case ELFCLASS32:
@@ -94,7 +123,7 @@ int main(int argc, char *argv[]) {
         }
         printf("\n  Version ABI:\t\t\t\t%d",header.e_ident[EI_ABIVERSION]);
         printf("\n  Type:\t\t\t\t");
-        switch (header.e_type) {
+        switch (byteshift16(header.e_type)) {
           case ET_REL:
             printf("REL (Fichier repositionnable)");
           break;
@@ -111,7 +140,7 @@ int main(int argc, char *argv[]) {
             printf("Type inconnu");
         }
         printf("\n  Machine:\t\t\t\t\t");
-        switch (header.e_machine) {
+        switch (byteshift16(header.e_machine)) {
           case EM_M32:
             printf("WE 32100 AT&T");
           break;
@@ -177,16 +206,17 @@ int main(int argc, char *argv[]) {
           default://EV_NONE
             printf("Invalide");
         }
-        printf("\n  Adresse du point d'entrée:\t\t0x%01x", header.e_ident[EI_PAD]);
-        printf("\n  Début des en-tête de programme:\t%lu", header.e_phoff);
-        printf("\n  Début des en-tête de section:\t\t%lu", header.e_shoff);
-        printf("\n  Fanions:\t\t\t\t0x%01x", header.e_flags);
-        printf("\n  Taille de cet en-tête:\t\t%d (octets)", header.e_ehsize);
-        printf("\n  Taille de l'en-tête du programme:\t%d (octets)", header.e_phentsize);
-        printf("\n  Nombre d'en-tête du programme:\t%d", header.e_phnum);
-        printf("\n  Taille des en-têtes de section:\t%d (octets)", header.e_shentsize);
-        printf("\n  Nombre d'en-têtes de section:\t\t%d", header.e_shnum);
-        printf("\n  Table d'indexes des chaînes d'en-tête de section:\t%d\n", header.e_shstrndx);
+        printf("\n  Adresse du point d'entrée:\t\t%01x", header.e_ident[EI_PAD]);
+        printf("\n  Début des en-tête de programme:\t%u", byteshift32(header.e_phoff));
+        printf("\n  Début des en-tête de section:\t\t%u", byteshift32(header.e_shoff));
+        printf("\n  Fanions:\t\t\t\t0x%01x", byteshift32(header.e_flags));
+        printf("\n  Taille de cet en-tête:\t\t%d (octets)", byteshift16(header.e_ehsize));
+        printf("\n  Taille de l'en-tête du programme:\t%d (octets)", byteshift16(header.e_phentsize));
+        printf("\n  Nombre d'en-tête du programme:\t%d", byteshift16(header.e_phnum));
+        printf("\n  Taille des en-têtes de section:\t%d (octets)", byteshift16(header.e_shentsize));
+        printf("\n  Nombre d'en-têtes de section:\t\t%d", byteshift16(header.e_shnum));
+        printf("\n  Table d'indexes des chaînes d'en-tête de section:\t%d\n", byteshift16(header.e_shstrndx));
+
       }
       fclose(elfFile);
     }
