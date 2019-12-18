@@ -28,13 +28,20 @@ void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* 
     fread(&table_chaine, 1, sizeof(section), elfFile);
     fseek(elfFile,table_chaine.sh_offset + byteShift(section.sh_name),SEEK_SET);
     //printf("BBBBBBBBBBBBBBBBBBBBBBBBBBB\n");
-    char c=fgetc(elfFile)>>24;
+    char c3=fgetc(elfFile);
+    char c2=fgetc(elfFile);
+    char c1=fgetc(elfFile);
+    char c0=fgetc(elfFile);
+
     int i=0;
     while(!(c==0 || i >= (sizeof(name)/sizeof(char)))){
         //printf("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC\n");
         name[i]=c;
         i++;
-        c=fgetc(elfFile);
+        c3=fgetc(elfFile);
+        c2=fgetc(elfFile);
+        c1=fgetc(elfFile);
+        c0=fgetc(elfFile);
     }
     //printf("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\n");
     name[i]='\0';
