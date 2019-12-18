@@ -3,11 +3,26 @@
 #include <string.h>
 #include <elf.h>
 
-uint32_t byteShift(uint32_t num) {
-  return ((num>>24)&0xff) | // move byte 3 to byte 0
-                    ((num<<8)&0xff0000) | // move byte 1 to byte 2
-                    ((num>>8)&0xff00) | // move byte 2 to byte 1
-                    ((num<<24)&0xff000000); // byte 0 to byte 3
+int isbigendian(){
+    return 1;
+}
+
+uint16_t byteshift16(uint16_t n){
+    if (isbigendian()){
+        return ((n>>8)&0xff) | ((n<<8)&0xff00);
+    }
+    else{
+        return n;
+    }
+}
+
+uint32_t byteshift32(uint32_t n) {
+    if (isbigendian()){
+          return ((n>>24)&0xff) | ((n<<8)&0xff0000) | ((n>>8)&0xff00) | ((n<<24)&0xff000000);
+    }
+    else{
+        return n;
+    }
 }
 
 
@@ -23,19 +38,12 @@ void foottext(){
 
 void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name){
     Elf32_Shdr table_chaine;
-    //printf("AAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
-    fseek(elfFile, byteShift(header.e_shoff) + byteShift(header.e_shstrndx)*sizeof(section),SEEK_SET);
-    fread(&table_chaine, 1, sizeof(section), elfFile);
-    fseek(elfFile,table_chaine.sh_offset + byteShift(section.sh_name),SEEK_SET);
-    //printf("BBBBBBBBBBBBBBBBBBBBBBBBBBB\n");
-    char c3=fgetc(elfFile);
-    char c2=fgetc(elfFile);
-    char c1=fgetc(elfFile);
-    char c0=fgetc(elfFile);
-
+    fseek(elfFile,byteshift32(header.e_shoff)+byteshift16(header.e_shstrndx)*byteshift16(header.e_shentsize),SEEK_SET);
+    fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
+    fseek(elfFile,byteshift32(table_chaine.sh_offset)+byteshift32(section.sh_name),SEEK_SET);
+    char c=fgetc(elfFile);
     int i=0;
-    while(!(c==0 || i >= (sizeof(name)/sizeof(char)))){
-        //printf("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC\n");
+    while(c!='\0'){
         name[i]=c;
         i++;
         c3=fgetc(elfFile);
@@ -43,9 +51,7 @@ void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* 
         c1=fgetc(elfFile);
         c0=fgetc(elfFile);
     }
-    //printf("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\n");
     name[i]='\0';
-    //printf("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
 }
 
 void align(char* str, int indent) {
@@ -177,14 +183,14 @@ int main(int argc, char *argv[]) {
         //fread(SectNames, 1, sectHdr.sh_size, ElfFile);
 
         // read all section headers
-        printf("Il  y a %d sections dans le fichier.", byteShift(header.e_shnum));
+        printf("Il  y a %d sections dans le fichier.", byteshift16(header.e_shnum));
         headtext();
-        for (int i = 0; i < byteShift(header.e_shnum); i++)
+        for (int i = 0; i < byteshift16(header.e_shnum); i++)
           {
             if(i > 20) exit(0);
           const char* name = "";
 
-          fseek(elfFile, byteShift(header.e_shoff) + i * sizeof(section), SEEK_SET);
+          fseek(elfFile, byteshift32(header.e_shoff) + i * sizeof(section), SEEK_SET);
           fread(&section, 1, sizeof(section), elfFile);
 
           // print section name
@@ -192,7 +198,7 @@ int main(int argc, char *argv[]) {
           //if (sectHdr.sh_name)
           //  name = SectNames + sectHdr.sh_name;
 
-          char nom_section[2500];
+          char nom_section[255];
 
 
 
@@ -200,15 +206,15 @@ int main(int argc, char *argv[]) {
           printf("%s ",nom_section);
           align(nom_section, 16);
 
-          typeToString(byteShift(section.sh_type));
-          printf("%016x ", byteShift(section.sh_addr));
-          printf("%08x\n     ", byteShift(section.sh_offset));
-          printf("%016x ", byteShift(section.sh_size));
-          printf("%016x ", byteShift(section.sh_entsize));
-          flagsToString(byteShift(section.sh_flags));
-          printf("%u\t", byteShift(section.sh_link));
-          printf("%u\t", byteShift(section.sh_info));
-          printf("%u\n", byteShift(section.sh_addralign));
+          typeToString(byteshift32(section.sh_type));
+          printf("%016x ", byteshift32(section.sh_addr));
+          printf("%08x\n     ", byteshift32(section.sh_offset));
+          printf("%016x ", byteshift32(section.sh_size));
+          printf("%016x ", byteshift32(section.sh_entsize));
+          flagsToString(byteshift32(section.sh_flags));
+          printf("%u\t", byteshift32(section.sh_link));
+          printf("%u\t", byteshift32(section.sh_info));
+          printf("%u\n", byteshift32(section.sh_addralign));
         }
         foottext();
       }
