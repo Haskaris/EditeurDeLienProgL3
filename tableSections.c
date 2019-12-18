@@ -46,10 +46,8 @@ void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* 
     while(c!='\0'){
         name[i]=c;
         i++;
-        c3=fgetc(elfFile);
-        c2=fgetc(elfFile);
-        c1=fgetc(elfFile);
-        c0=fgetc(elfFile);
+
+        c=fgetc(elfFile);
     }
     name[i]='\0';
 }
@@ -151,8 +149,11 @@ void typeToString(uint32_t type) {
     case SHT_HIUSER:
       printf("HIUSER           ");
       break;
+    case 1879048195:
+      printf("ARM_ATTRIBUTES   ");
+      break;
     default :
-      printf("Cas non traité   ");
+      printf("Err : %d     ", type);
   }
 }
 
@@ -187,7 +188,6 @@ int main(int argc, char *argv[]) {
         headtext();
         for (int i = 0; i < byteshift16(header.e_shnum); i++)
           {
-            if(i > 20) exit(0);
           const char* name = "";
 
           fseek(elfFile, byteshift32(header.e_shoff) + i * sizeof(section), SEEK_SET);
