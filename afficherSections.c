@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-#include <assert.h>
 
 int isbigendian(){
     return 1;
@@ -25,7 +24,6 @@ uint32_t byteshift32(uint32_t n) {
         return n;
     }
 }
-
 
 void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name){
     Elf32_Shdr table_chaine;
@@ -62,26 +60,23 @@ int main(int argc, char *argv[]) {
       printf("Erreur d'ouverture du fichier.\n");
     }
     else {
-      // read the header
+      // Lit le header
       fread(&header, 1, sizeof(header), elfFile);
 
-      // check so its really an elf file
+      // Est-ce que c'est vraiment un fichier ELF ?
       if (memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
-        //SectNames = malloc(sectHdr.sh_size);
-        //fseek(ElfFile, sectHdr.sh_offset, SEEK_SET);
-        //fread(SectNames, 1, sectHdr.sh_size, ElfFile);
 
-        // read all section headers
+        // Lit toutes les sections, et se décale sur la section demandée
         int i = 0;
-
-        while (i <= byteshift16(header.e_shnum) && i < atoi(argv[1])) {
+        while (i <= byteshift16(header.e_shnum) && i < atoi(argv[1]))
           i++;
-        }
 
         if (i <= byteshift16(header.e_shnum)) {
+          //Lit la section
 					fseek(elfFile, byteshift32(header.e_shoff) + i * sizeof(section), SEEK_SET);
           fread(&section, 1, sizeof(section), elfFile);
 
+          //Récupère le nom de la section
           get_section_name(elfFile, header, section, tableName);
 
           printf("Vidange hexadécimale de la section << %s >> :\n", tableName);
@@ -90,21 +85,31 @@ int main(int argc, char *argv[]) {
             fseek(elfFile,byteshift32(section.sh_offset)+j,SEEK_SET);
             printf("  0x%08x ", j);
             for (int k = 0; k < 16; k++){
-             unsigned char c;
-             fscanf(elfFile,"%c",&c);
-             printf("%02x",c);
-               if (k == 3 || k == 7 || k == 11)
-                 printf(" ");
+              if (j+k == byteshift32(section.sh_size)) {
+                for (int o = k; o < 16; o++) {
+                  printf("  ");
+                  if (o == 3 || o == 7 || o == 11)
+                    printf(" ");
+                }
+                break;
+              }
+              unsigned char c;
+              fscanf(elfFile,"%c",&c);
+              printf("%02x",c);
+              if (k == 3 || k == 7 || k == 11)
+                printf(" ");
              }
              printf(" ");
              fseek(elfFile,byteshift32(section.sh_offset)+j,SEEK_SET);
              for (int k = 0; k < 16; k++){
-              unsigned char c;
-              fscanf(elfFile,"%c",&c);
-              if(c<32 || c>127) printf(".");
-              else printf("%c",c);
-              }
-
+               if (j+k == byteshift32(section.sh_size)) {
+                 break;
+               }
+               unsigned char c;
+               fscanf(elfFile,"%c",&c);
+               if(c<32 || c>127) printf(".");
+               else printf("%c",c);
+            }
             printf("\n");
           }
         }
