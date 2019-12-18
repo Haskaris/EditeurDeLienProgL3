@@ -2,130 +2,169 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-/*
-    //si ça ne marche pas essayer ça :
-    //type
-    switch (ELF32_ST_TYPE(mysym.st_info)) {
-        case 0:
-            printf("  NOTY");
-            break;
-        case 1:
-            printf("  OBJT");
-            break;
-        case 2:
-            printf("  FUNC");
-            break;
-        case 3:
-            printf("  SECT");
-            break;
-        case 4:
-            printf("  FILE");
-            break;
+#include "enteteEtape4.h"
 
-        default:
-            break;
+int isbigendian(Elf32_Ehdr h){
+	switch (h.e_ident[EI_DATA]) {
+		case ELFDATA2LSB:
+      			return 0;
+    		case ELFDATA2MSB:
+      			return 1;
+    		default://ELFDATANONE
+      			printf("isbigEndian problème pas d'encodage\n");
+			exit(1);
+  	}
+}
+
+uint16_t byteshift16(uint16_t n, int bigEndian){
+    if (bigEndian){
+        return ((n>>8)&0xff) | ((n<<8)&0xff00);
     }
-
-    //bind
-    switch(ELF32_ST_BIND(mysym.st_info))
-    {
-        case 0: printf(" LOCL");
-            break;
-        case 1: printf(" GLOB");
-            break;
-        case 2: printf(" WEAK");
-            break;
-        case 3: printf("  NUM");
-            break;
-
-        default:
-            break;
+    else{
+        return n;
     }
+}
 
-*/
+uint32_t byteshift32(uint32_t n, int bigEndian) {
+    if (bigEndian){
+          return ((n>>24)&0xff) | ((n<<8)&0xff0000) | ((n>>8)&0xff00) | ((n<<24)&0xff000000);
+    }
+    else{
+        return n;
+    }
+}
 
-char * read_section64(int32_t fd, Elf64_Shdr sh)
+uint64_t byteshift64(uint64_t n, int bigEndian) {
+    if (bigEndian){
+          return ((n>>24)&0xff0000) | ((n<<8)&0xff00000000) | ((n>>8)&0xff000000) | ((n<<24)&0xff0000000000) | ((n>>40)&0xff00) | ((n<<40)&0xff000000000000) | ((n<<56)&0xff00000000000000) | ((n>>56)&0xff);
+    }
+    else{
+        return n;
+    }
+}
+
+char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table, int bigEndian)
 {
-	//alloue la mémoire requise pour stocker les informations du fichier elf
-	//sh_size contient la taille de la section en octet
-	char* buff = malloc(sh.sh_size);
-	if(!buff) {
-		printf("%s:Failed to allocate %ldbytes\n",
-				__func__, sh.sh_size);
-	}
-
-	assert(buff != NULL);
-	//lseek permet de placer la tête de lecture/ecriture à la position sh.sh_offset du descripteur fd
-	//sh.sh_offset indique le décalage du premier octet de la section par rapport au début du fichier
-	assert(lseek(fd, (off_t)sh.sh_offset, SEEK_SET) == (off_t)sh.sh_offset);
-	//lit le fichier et le stock dans le buffer buff
-	assert(read(fd, (void *)buff, sh.sh_size) == sh.sh_size);
-
-	return buff;
+    //Lire les noms des sections
+    char *nom = malloc(byteshift32(sh_table.sh_size, bigEndian));
+    fseek(elfFile, byteshift32(sh_table.sh_offset, bigEndian), SEEK_SET);
+    fread(nom, 1, byteshift32(sh_table.sh_size, bigEndian), elfFile);
+    return nom;
 }
 
-void print_symbol_table64(int32_t fd, Elf64_Ehdr eh, Elf64_Shdr sh_table[], uint32_t symbol_table){	
-	char *str_tbl;
-	Elf64_Sym* sym_tbl;
-	uint32_t i, symbol_count;
-	//on lit et stock la table des symboles dans la variable sym_tbl
-	sym_tbl = (Elf64_Sym*)read_section64(fd, sh_table[symbol_table]);
+void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uint32_t indice, int bigEndian){	
+	Elf32_Sym sym_tbl;
+	uint32_t i, nombre_symbol;
+	//accéde à la table des symboles
+	fseek(elfFile, eh.e_shoff + indice * sizeof(sh_table), SEEK_SET);
+	fread(&sh_table, 1, sizeof(sh_table), elfFile);
+  	//printf("Name : %s\n",get_section_names(elfFile, sh_table, bigEndian) + sh_table.sh_name);
 	
-	//sh_link contient un lien vers l'indice de la table des entêtes de sections
-	uint32_t str_tbl_ndx = sh_table[symbol_table].sh_link;
-	//debug("str_table_ndx = 0x%x\n", str_tbl_ndx);
-	//on lit et stock les informations du lien du ficheir ELF
-	str_tbl = read_section64(fd, sh_table[str_tbl_ndx]);
-	
-	//nombre de symbole de la section
-	symbol_count = (sh_table[symbol_table].sh_size/sizeof(Elf64_Sym));
-	printf("%d symbols\n", symbol_count);
-	
+	// calcul du nombre de symbole   	
+	nombre_symbol = byteshift32(sh_table.sh_size, bigEndian) / byteshift32(sh_table.sh_entsize, bigEndian);
+  	fseek(elfFile, byteshift32(sh_table.sh_offset, bigEndian), SEEK_SET);
+
+	printf("La table de symboles << .symtab >> contient %d entrées :\n", nombre_symbol);
+	printf("  Num:   Valeur     Tail  Type  Lien  Vis     Ndx Nom\n");
+        
 	//on affiche les informations du symbole
-	for(i=0; i< symbol_count; i++) {
-		printf("0x%08lx ", sym_tbl[i].st_value);
-		printf("0x%02x ", ELF32_ST_BIND(sym_tbl[i].st_info));
-		printf("0x%02x ", ELF32_ST_TYPE(sym_tbl[i].st_info));
-		printf("%s\n", (str_tbl + sym_tbl[i].st_name));
-	}
+	for(i=0; i< nombre_symbol; i++) {
+		fread(&sym_tbl, 1, sizeof(sym_tbl), elfFile);
+		printf("   %d:",i);
+		printf("  %08x ", byteshift32(sym_tbl.st_value, bigEndian));
+		printf(" %u ", byteshift32(sym_tbl.st_size, bigEndian));
+		switch (ELF32_ST_TYPE(sym_tbl.st_info)) {
+        		case 0:
+            			printf("  NOTYPE  ");
+            			break;
+       			case 1:
+            			printf("  OBJT  ");
+            			break;
+        		case 2:
+            			printf("  FUNC  ");
+            			break;
+        		case 3:
+            			printf("  SECTION  ");
+            			break;
+        		case 4:
+            			printf("  FILE  ");
+            			break;
+
+       			default: printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_table32 switch ELF32_ST_TYPE ");
+            			break;
+    		}
+		switch(ELF32_ST_BIND(sym_tbl.st_info))
+    		{
+       	 		case 0: printf(" LOCAL ");
+            			break;
+        		case 1: printf(" GLOBAL ");
+            			break;
+        		case 2: printf(" WEAK ");
+            			break;
+        		case 3: printf("  NUM ");
+            			break;
+        		default: printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_table32 switch ELF32_ST_BIND ");
+        			break;
+    		}
+		//printf(" %x  ", sym_tbl.st_other);
+		switch(ELF32_ST_VISIBILITY(sym_tbl.st_other)){
+			case 0: printf(" DEFAULT ");
+				break;
+			case 1: printf(" INTERNAL ");
+				break;
+			case 2: printf(" HIDDEN ");
+				break;
+			case 3: printf(" PROTECTED ");
+				break;
+			default: printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_table64 switch ELF64_ST_VISIBILITY ");
+				break;
+		}
+    		printf(" %x  ", byteshift16(sym_tbl.st_shndx, bigEndian));
+    		printf(" %02x\n", byteshift32(sym_tbl.st_name, bigEndian));	}
 }
 
-void print_table_symbol(FILE* elfFile, Elf64_Ehdr eh, Elf64_Shdr sh_table[]){
+void print_table_symbol(FILE* elfFile, Elf32_Ehdr eh, int bigEndian){
 	uint32_t i;
-	//créé le descripteur de fichier
-	int32_t fd = (int32_t)fileno(efFile);
-	
-	//eh.e_shnum contient le nombre d'entrees de la table des entêtes de sections
-	for(i=0; i<eh.e_shnum; i++) {
-		//sh_table[i].sh_type définit le contenu et la sémantique de la section
-		// SHT_SYMTAB cette section contient une table de symbole
-		// SHT_DYNSYM est l'autre section pour la table des symboles de liaison dynamique
-		if ((sh_table[i].sh_type==SHT_SYMTAB)
-				|| (sh_table[i].sh_type==SHT_DYNSYM)) {
-			printf("\n[Section %03d]", i);
-			print_symbol_table64(fd, eh, sh_table, i);
+	Elf32_Shdr section;
+	//parcours la table des entêtes et 
+	//cherche la section contenant la table des symboles (SHT_SYMTAB)		
+	for(i=0; i<byteshift16(eh.e_shnum, bigEndian); i++) {
+		fseek(elfFile, byteshift32(eh.e_shoff, bigEndian) + i * sizeof(section), SEEK_SET);
+         	fread(&section, 1, sizeof(section), elfFile);
+		if (byteshift32(section.sh_type, bigEndian)==SHT_SYMTAB) {
+			print_symbol_table32(elfFile, eh, section, i, bigEndian);
+			break;
 		}
 	}
 }
 
-int main(int argc, char* argv[]){
-	FILE * elfFile;
 
-	char buff[255];
-	if (argc == 1) {
-		printf("Il faut donner un fichier en argument.\n");
-		exit(1);
-	} else {
-		elfFile = fopen(argv[1], "r");
-		if (elfFile == NULL) {
-			printf("Erreur d'ouverture du fichier.\n");
-		}
-	}
-	// read the symbol table
-	//fread(&symbole, 1, sizeof(symbole), elfFile);
-	
-	// check so its really an elf file
-	//if (memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
-	
-	return 0;
+
+int main(int argc, char *argv[]) {
+  FILE * elfFile;
+
+  Elf32_Ehdr header;
+
+  if (argc != 2) {
+    printf("Utilisation : %s <ELF_FILE>\n", argv[0]);
+    exit(1);
+  }
+  else {
+    elfFile = fopen(argv[1], "r");
+    if (elfFile == NULL) {
+      printf("Erreur d'ouverture du fichier.\n");
+    }
+    else {
+      // read the header
+      	fread(&header, 1, sizeof(header), elfFile);
+	if (isbigendian(header)){
+		print_table_symbol(elfFile, header, 1);
+		//printf("pas encore fait big endian"); 
+	} else { 
+		//printf("pas encore fait litle endian");
+		print_table_symbol(elfFile, header, 0); 
+	}  
+	fclose(elfFile);
+    }
+  }
 }
