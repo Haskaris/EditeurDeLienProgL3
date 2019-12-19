@@ -103,9 +103,8 @@ int main(int argc, char *argv[]) {
              printf(" ");
              fseek(elfFile,byteshift32(section.sh_offset)+j,SEEK_SET);
              for (int k = 0; k < 16; k++){
-               if (j+k == byteshift32(section.sh_size)) {
+               if (j+k == byteshift32(section.sh_size))
                  break;
-               }
                unsigned char c;
                fscanf(elfFile,"%c",&c);
                if(c<32 || c>127) printf(".");
