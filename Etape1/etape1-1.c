@@ -176,8 +176,8 @@ int main(int argc, char *argv[]) {
       // Lit l'entête
       fread(&header, sizeof(header), 1,elfFile);
       if (isbigendian(header)){
-		bigEndian = 1;
-      } 
+		      bigEndian = 1;
+      }
 
       // Est-ce que c'est bien un fichier elf ?
       if (memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {

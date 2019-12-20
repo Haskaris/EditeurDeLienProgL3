@@ -7,12 +7,12 @@
 int isbigendian(Elf32_Ehdr h){
 	switch (h.e_ident[EI_DATA]) {
 		case ELFDATA2LSB:
-      			return 0;
-    		case ELFDATA2MSB:
-      			return 1;
-    		default://ELFDATANONE
-      			printf("isbigEndian problème pas d'encodage\n");
-			exit(1);
+  			return 0;
+		case ELFDATA2MSB:
+  			return 1;
+		default://ELFDATANONE
+  			printf("isbigEndian problème pas d'encodage\n");
+				exit(1);
   	}
 }
 
