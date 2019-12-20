@@ -23,7 +23,6 @@ void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* 
     while(c!='\0'){
         name[i]=c;
         i++;
-
         c=fgetc(elfFile);
     }
     name[i]='\0';
@@ -31,8 +30,6 @@ void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* 
 
 void align(char* str, int indent) {
   int length = strlen(str);
-
-  //printf("AAAAAAAAAAAAAAAAAAA %d : %s AAAAAAAAAAAAAAAAAA", length, str);
   if(length >= indent) return;
   for(int i = length; i < indent; i++) {
     printf(" ");
@@ -76,6 +73,7 @@ void flagsToString(uint32_t flag) {
   for (int count = 0; count < i; count++) printf(" ");
   printf("\t");
 }
+
 void typeToString(uint32_t type) {
   switch (type) {
     case SHT_NULL:
@@ -158,9 +156,6 @@ int main(int argc, char *argv[]) {
       }
       // check so its really an elf file
       if (memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
-        //SectNames = malloc(sectHdr.sh_size);
-        //fseek(ElfFile, sectHdr.sh_offset, SEEK_SET);
-        //fread(SectNames, 1, sectHdr.sh_size, ElfFile);
 
         // read all section headers
         printf("Il  y a %d sections dans le fichier.", byteshift16(header.e_shnum, bigEndian));
@@ -174,12 +169,7 @@ int main(int argc, char *argv[]) {
 
           // print section name
           printf("[%2u] ", i);
-          //if (sectHdr.sh_name)
-          //  name = SectNames + sectHdr.sh_name;
-
           char nom_section[255];
-
-
 
           get_section_name(elfFile, header, section,nom_section, bigEndian);
           printf("%s ",nom_section);
