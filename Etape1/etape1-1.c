@@ -157,34 +157,12 @@ void machine(Elf32_Ehdr h, int bigEndian) {
   }
 }
 
-int main(int argc, char *argv[]) {
+void affichage_Entete_Fichier_ELF(Elf32_Ehdr header, int bigEndian) {
+  	char buff[255];
 
-  FILE * elfFile;
-  Elf32_Ehdr header;
-  char buff[255];
-  int bigEndian = 0;
-  if (argc != 2) {
-    printf("Utilisation : %s <ELF_FILE>\n", argv[0]);
-    exit(1);
-  }
-  else {
-    elfFile = fopen(argv[1], "r");
-    if (elfFile == NULL) {
-      printf("Erreur lors de l'ouverture du fichier.\n");
-    }
-    else {
-      // Lit l'entête
-      fread(&header, sizeof(header), 1,elfFile);
-      if (isbigendian(header)){
-		bigEndian = 1;
-      } 
-
-      // Est-ce que c'est bien un fichier elf ?
-      if (memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
-
-        printf("En-tête ELF:\n  Magique:\t");
-        for (int i = 0; i < 16; i++)
-          printf("%02x ",header.e_ident[i]);
+  	printf("En-tête ELF:\n  Magique:\t");
+  	for (int i = 0; i < 16; i++)
+          	printf("%02x ",header.e_ident[i]);
 
         printf("\n  Classe:\t\t\t\t");
         classeArchitecture(header);
@@ -219,9 +197,4 @@ int main(int argc, char *argv[]) {
         printf("\n  Taille des en-têtes de section:\t%d (octets)", byteshift16(header.e_shentsize, bigEndian));
         printf("\n  Nombre d'en-têtes de section:\t\t%d", byteshift16(header.e_shnum, bigEndian));
         printf("\n  Table d'indexes des chaînes d'en-tête de section:\t%d\n", byteshift16(header.e_shstrndx, bigEndian));
-
-      }
-      fclose(elfFile);
-    }
-  }
 }

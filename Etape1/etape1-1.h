@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-#include "../librairie/lib-bigEndian.c"
+#include "../librairie/lib-bigEndian.h"
 
 /* Affiche la classe du fichier ELF, 32 ou 64 bits
  * arguments : 
@@ -44,3 +44,10 @@ void fileType(Elf32_Ehdr h, int bigEndian);
  *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
 void machine(Elf32_Ehdr h, int bigEndian);
+
+/* Affiche l'entête d'un fichier ELF
+ * arguments : 
+ *	- l'entête du fichier ELF (h)
+ *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
+*/
+void affichage_Entete_Fichier_ELF(Elf32_Ehdr header, int bigEndian);

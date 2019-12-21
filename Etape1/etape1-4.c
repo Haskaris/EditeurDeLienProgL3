@@ -84,48 +84,18 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uin
     		printf(" %02x\n", byteshift32(sym_tbl.st_name, bigEndian));	}
 }
 
-void print_table_symbol(FILE* elfFile, Elf32_Ehdr eh, int bigEndian){
+
+void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header, int bigEndian) {
 	uint32_t i;
 	Elf32_Shdr section;
 	//parcours la table des entêtes et 
 	//cherche la section contenant la table des symboles (SHT_SYMTAB)		
-	for(i=0; i<byteshift16(eh.e_shnum, bigEndian); i++) {
-		fseek(elfFile, byteshift32(eh.e_shoff, bigEndian) + i * sizeof(section), SEEK_SET);
+	for(i=0; i<byteshift16(header.e_shnum, bigEndian); i++) {
+		fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + i * sizeof(section), SEEK_SET);
          	fread(&section, 1, sizeof(section), elfFile);
 		if (byteshift32(section.sh_type, bigEndian)==SHT_SYMTAB) {
-			print_symbol_table32(elfFile, eh, section, i, bigEndian);
+			print_symbol_table32(elfFile, header, section, i, bigEndian);
 			break;
 		}
 	}
-}
-
-
-
-int main(int argc, char *argv[]) {
-  FILE * elfFile;
-
-  Elf32_Ehdr header;
-
-  if (argc != 2) {
-    printf("Utilisation : %s <ELF_FILE>\n", argv[0]);
-    exit(1);
-  }
-  else {
-    elfFile = fopen(argv[1], "r");
-    if (elfFile == NULL) {
-      printf("Erreur d'ouverture du fichier.\n");
-    }
-    else {
-      // read the header
-      	fread(&header, 1, sizeof(header), elfFile);
-	if (isbigendian(header)){
-		print_table_symbol(elfFile, header, 1);
-		//printf("pas encore fait big endian"); 
-	} else { 
-		//printf("pas encore fait litle endian");
-		print_table_symbol(elfFile, header, 0); 
-	}  
-	fclose(elfFile);
-    }
-  }
 }

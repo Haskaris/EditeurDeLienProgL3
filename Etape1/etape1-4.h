@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-#include "../librairie/lib-bigEndian.c"
+#include "../librairie/lib-bigEndian.h"
 
 /* Lit le nom des sections de la table des entêtes
  * et le renvoit
@@ -28,7 +28,7 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uin
  * puis appel la fonction print_symbol_table64 pour écrire son contenu
  * arguments : 
  *	- le fichier ELF (elfFile) ouvert
- *	- entête du fichier ELF (eh)
+ *	- entête du fichier ELF (header)
  *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
-void print_table_symbol(FILE* elfFile, Elf32_Ehdr eh, int bigEndian);
+void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header, int bigEndian);
