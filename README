@@ -47,4 +47,4 @@ Les commandes :
  - git merge X : Fusionne la branche X sur la branche actuelle (penser à faire un 'git pull' de la branche X au préalable)
  
 Ce qu'il faut savoir faire :
- Une fois que vous avez fait votre travail, vous faite un commit puis un push sur votre branche ! C'est pas sorcier =)
+ Une fois que vous avez fait votre travail, vous faites un commit puis un push sur votre branche ! C'est pas sorcier =)
