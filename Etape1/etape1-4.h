@@ -1,3 +1,5 @@
+#ifndef __ETAPE1_4_H__
+#define __ETAPE1_4_H__
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,9 +28,10 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uin
 
 /* Sert à accéder à la bonne section dans la table des entêtes
  * puis appel la fonction print_symbol_table64 pour écrire son contenu
- * arguments : 
+ * arguments :
  *	- le fichier ELF (elfFile) ouvert
  *	- entête du fichier ELF (header)
  *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
 void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header, int bigEndian);
+#endif

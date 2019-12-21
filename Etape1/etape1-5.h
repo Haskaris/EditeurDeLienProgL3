@@ -1,3 +1,5 @@
+#ifndef __ETAPE1_5_H__
+#define __ETAPE1_5_H__
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,3 +29,4 @@ void afficher_relocation_type(int type);
  *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
 void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header, int bigEndian);
+#endif

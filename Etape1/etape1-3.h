@@ -1,3 +1,5 @@
+#ifndef __ETAPE1_3_H__
+#define __ETAPE1_3_H__
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,3 +24,4 @@ void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, ch
  *	- entier qui correspond au numéro de la section que l'on veut afficher (numSection)
 */
 void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int bigEndian, int numSection);
+#endif
