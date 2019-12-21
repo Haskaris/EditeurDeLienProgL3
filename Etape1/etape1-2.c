@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <elf.h>
+//Inclure les autres du .h ?
 #include "etape1-2.h"
 
 void headtext(){

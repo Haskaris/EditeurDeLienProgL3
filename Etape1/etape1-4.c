@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <elf.h>
+//Inclure les autres du .h ?
 #include "etape1-4.h"
 
 char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table, int bigEndian)
@@ -13,21 +10,21 @@ char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table, int bigEndian)
     return nom;
 }
 
-void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uint32_t indice, int bigEndian){	
+void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uint32_t indice, int bigEndian){
 	Elf32_Sym sym_tbl;
 	uint32_t i, nombre_symbol;
 	//accéde à la table des symboles
 	fseek(elfFile, eh.e_shoff + indice * sizeof(sh_table), SEEK_SET);
 	fread(&sh_table, 1, sizeof(sh_table), elfFile);
   	//printf("Name : %s\n",get_section_names(elfFile, sh_table, bigEndian) + sh_table.sh_name);
-	
-	// calcul du nombre de symbole   	
+
+	// calcul du nombre de symbole
 	nombre_symbol = byteshift32(sh_table.sh_size, bigEndian) / byteshift32(sh_table.sh_entsize, bigEndian);
   	fseek(elfFile, byteshift32(sh_table.sh_offset, bigEndian), SEEK_SET);
 
 	printf("La table de symboles << .symtab >> contient %d entrées :\n", nombre_symbol);
 	printf("  Num:   Valeur     Tail  Type  Lien  Vis     Ndx Nom\n");
-        
+
 	//on affiche les informations du symbole
 	for(i=0; i< nombre_symbol; i++) {
 		fread(&sym_tbl, 1, sizeof(sym_tbl), elfFile);
@@ -88,8 +85,8 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uin
 void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header, int bigEndian) {
 	uint32_t i;
 	Elf32_Shdr section;
-	//parcours la table des entêtes et 
-	//cherche la section contenant la table des symboles (SHT_SYMTAB)		
+	//parcours la table des entêtes et
+	//cherche la section contenant la table des symboles (SHT_SYMTAB)
 	for(i=0; i<byteshift16(header.e_shnum, bigEndian); i++) {
 		fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + i * sizeof(section), SEEK_SET);
          	fread(&section, 1, sizeof(section), elfFile);

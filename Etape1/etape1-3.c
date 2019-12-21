@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <elf.h>
+//Inclure les autres du .h ?
 #include "etape1-3.h"
 
 
@@ -39,7 +36,7 @@ void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int bigEndian, 
 
           	//Récupère le nom de la section
           	get_section_name_3(elfFile, header, section, tableName, bigEndian);
-	
+
           	printf("Vidange hexadécimale de la section << %s >> :\n", tableName);
 
           	for(int j = 0; j < byteshift32(section.sh_size, bigEndian); j+=16) {

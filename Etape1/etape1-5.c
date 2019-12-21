@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <elf.h>
+//Inclure les autres du .h ?
 #include "etape1-5.h"
 
 void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name, int bigEndian){
@@ -64,7 +61,7 @@ void afficher_relocation_type(int type){
 void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header, int bigEndian) {
   	Elf32_Shdr section;
 
-  	char buff[255]; 
+  	char buff[255];
 
 
         //SectNames = malloc(sectHdr.sh_size);
