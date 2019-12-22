@@ -47,7 +47,6 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header,
 	Elf32_Shdr section;
 
   // read all section headers
-  //char nom_section[255];
 	for (int i = 0; i < byteshift16(header.e_shnum, bigEndian); i++){
 		fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + i * byteshift16(header.e_shentsize, bigEndian), SEEK_SET);
 		fread(&section, 1, sizeof(section), elfFile);
