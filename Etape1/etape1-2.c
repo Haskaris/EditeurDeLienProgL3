@@ -13,11 +13,16 @@ void foottext(){
 
 }
 
-void get_section_name_2(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name, int bigEndian){
+void get_section_name_2(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name){
     Elf32_Shdr table_chaine;
-    fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + byteshift16(header.e_shstrndx, bigEndian) * byteshift16(header.e_shentsize, bigEndian), SEEK_SET);
+    fseek(elfFile, header.e_shoff + header.e_shstrndx * header.e_shentsize, SEEK_SET);
     fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
-    fseek(elfFile, byteshift32(table_chaine.sh_offset, bigEndian) + byteshift32(section.sh_name, bigEndian), SEEK_SET);
+    //Si le fichier ELF n'est pas en litle Endian on l'inverse
+    if (isbigendian(header)){
+	inversion_Sections(&table_chaine);
+    }
+    fseek(elfFile, table_chaine.sh_offset + section.sh_name, SEEK_SET);
+
     char c = fgetc(elfFile);
     int i=0;
     while(c!='\0'){
@@ -134,21 +139,26 @@ void typeToString(uint32_t type) {
   }
 }
 
-void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header, int bigEndian) {
+void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header) {
   	Elf32_Shdr section;
   	char buff[255];
+	
         //SectNames = malloc(sectHdr.sh_size);
         //fseek(ElfFile, sectHdr.sh_offset, SEEK_SET);
         //fread(SectNames, 1, sectHdr.sh_size, ElfFile);
 
         // read all section headers
-        printf("Il  y a %d sections dans le fichier.", byteshift16(header.e_shnum, bigEndian));
+        printf("Il  y a %d sections dans le fichier.", header.e_shnum);
         headtext();
-        for (int i = 0; i < byteshift16(header.e_shnum, bigEndian); i++){
+        for (int i = 0; i < header.e_shnum; i++){
           	const char* name = "";
 
-          	fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + i * sizeof(section), SEEK_SET);
+          	fseek(elfFile, header.e_shoff + i * sizeof(section), SEEK_SET);
           	fread(&section, 1, sizeof(section), elfFile);
+		//Si le fichier ELF n'est pas en litle Endian on l'inverse
+		if (isbigendian(header)){
+			inversion_Sections(&section);
+		}
 
           	// print section name
           	printf("[%2u] ", i);
@@ -159,19 +169,19 @@ void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header, int bigEndian) {
 
 
 
-          	get_section_name_2(elfFile, header, section,nom_section, bigEndian);
+          	get_section_name_2(elfFile, header, section, nom_section);
           	printf("%s ",nom_section);
           	align(nom_section, 16);
 
-          	typeToString(byteshift32(section.sh_type, bigEndian));
-          	printf("%016x ", byteshift32(section.sh_addr, bigEndian));
-          	printf("%08x\n     ", byteshift32(section.sh_offset, bigEndian));
-          	printf("%016x ", byteshift32(section.sh_size, bigEndian));
-          	printf("%016x ", byteshift32(section.sh_entsize, bigEndian));
-          	flagsToString(byteshift32(section.sh_flags, bigEndian));
-          	printf("%u\t", byteshift32(section.sh_link, bigEndian));
-          	printf("%u\t", byteshift32(section.sh_info, bigEndian));
-          	printf("%u\n", byteshift32(section.sh_addralign, bigEndian));
+          	typeToString(section.sh_type);
+          	printf("%016x ", section.sh_addr);
+          	printf("%08x\n     ", section.sh_offset);
+          	printf("%016x ", section.sh_size);
+          	printf("%016x ", section.sh_entsize);
+          	flagsToString(section.sh_flags);
+          	printf("%u\t", section.sh_link);
+          	printf("%u\t", section.sh_info);
+          	printf("%u\n", section.sh_addralign);
         }
         foottext();
 }

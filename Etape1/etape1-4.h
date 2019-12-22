@@ -9,9 +9,8 @@
  * arguments :
  *	- le fichier ELF (elfFile) ouvert
  *	- la table des entêtes du fichier ELF (sh_table)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
-char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table, int bigEndian);
+char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table);
 
 /* Créer la table des symboles, la lit dans le fichier ELF
  * puis écrit son contenu dans la console
@@ -20,15 +19,13 @@ char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table, int bigEndian);
  *	- entête du fichier ELF (eh)
  *	- table des entêtes du fichier ELF (sh_table)
  *	- l'indice de la bonne section dans la table des entêtes (indice)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
-void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uint32_t indice, int bigEndian);
+void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uint32_t indice);
 
 /* Sert à accéder à la bonne section dans la table des entêtes
  * puis appel la fonction print_symbol_table64 pour écrire son contenu
  * arguments : 
  *	- le fichier ELF (elfFile) ouvert
  *	- entête du fichier ELF (header)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
-void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header, int bigEndian);
+void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header);

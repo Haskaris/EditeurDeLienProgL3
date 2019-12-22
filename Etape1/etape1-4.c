@@ -4,26 +4,28 @@
 #include <elf.h>
 #include "etape1-4.h"
 
-char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table, int bigEndian)
+char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table)
 {
     //Lire les noms des sections
-    char *nom = malloc(byteshift32(sh_table.sh_size, bigEndian));
-    fseek(elfFile, byteshift32(sh_table.sh_offset, bigEndian), SEEK_SET);
-    fread(nom, 1, byteshift32(sh_table.sh_size, bigEndian), elfFile);
+    char *nom = malloc(sh_table.sh_size);
+    fseek(elfFile, sh_table.sh_offset, SEEK_SET);
+    fread(nom, 1, sh_table.sh_size, elfFile);
     return nom;
 }
 
-void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uint32_t indice, int bigEndian){	
+void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uint32_t indice){	
 	Elf32_Sym sym_tbl;
 	uint32_t i, nombre_symbol;
 	//accéde à la table des symboles
 	fseek(elfFile, eh.e_shoff + indice * sizeof(sh_table), SEEK_SET);
 	fread(&sh_table, 1, sizeof(sh_table), elfFile);
   	//printf("Name : %s\n",get_section_names(elfFile, sh_table, bigEndian) + sh_table.sh_name);
-	
+	if (isbigendian(eh)){
+		inversion_Sections(&sh_table);
+    	}
 	// calcul du nombre de symbole   	
-	nombre_symbol = byteshift32(sh_table.sh_size, bigEndian) / byteshift32(sh_table.sh_entsize, bigEndian);
-  	fseek(elfFile, byteshift32(sh_table.sh_offset, bigEndian), SEEK_SET);
+	nombre_symbol = sh_table.sh_size / sh_table.sh_entsize;
+  	fseek(elfFile, sh_table.sh_offset, SEEK_SET);
 
 	printf("La table de symboles << .symtab >> contient %d entrées :\n", nombre_symbol);
 	printf("  Num:   Valeur     Tail  Type  Lien  Vis     Ndx Nom\n");
@@ -31,9 +33,12 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uin
 	//on affiche les informations du symbole
 	for(i=0; i< nombre_symbol; i++) {
 		fread(&sym_tbl, 1, sizeof(sym_tbl), elfFile);
+		if (isbigendian(eh)){
+			insersion_Table_Symbole(&sym_tbl);
+		}
 		printf("   %d:",i);
-		printf("  %08x ", byteshift32(sym_tbl.st_value, bigEndian));
-		printf(" %u ", byteshift32(sym_tbl.st_size, bigEndian));
+		printf("  %08x ", sym_tbl.st_value);
+		printf(" %u ", sym_tbl.st_size);
 		switch (ELF32_ST_TYPE(sym_tbl.st_info)) {
         		case 0:
             			printf("  NOTYPE  ");
@@ -80,21 +85,25 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uin
 			default: printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_table64 switch ELF64_ST_VISIBILITY ");
 				break;
 		}
-    		printf(" %x  ", byteshift16(sym_tbl.st_shndx, bigEndian));
-    		printf(" %02x\n", byteshift32(sym_tbl.st_name, bigEndian));	}
+    		printf(" %x  ", sym_tbl.st_shndx);
+    		printf(" %02x\n", sym_tbl.st_name);	
+	}
 }
 
 
-void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header, int bigEndian) {
+void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header) {
 	uint32_t i;
 	Elf32_Shdr section;
 	//parcours la table des entêtes et 
 	//cherche la section contenant la table des symboles (SHT_SYMTAB)		
-	for(i=0; i<byteshift16(header.e_shnum, bigEndian); i++) {
-		fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + i * sizeof(section), SEEK_SET);
+	for(i=0; i<header.e_shnum; i++) {
+		fseek(elfFile, header.e_shoff + i * sizeof(section), SEEK_SET);
          	fread(&section, 1, sizeof(section), elfFile);
-		if (byteshift32(section.sh_type, bigEndian)==SHT_SYMTAB) {
-			print_symbol_table32(elfFile, header, section, i, bigEndian);
+		if (isbigendian(header)){
+			inversion_Sections(&section);
+		}
+		if (section.sh_type ==SHT_SYMTAB) {
+			print_symbol_table32(elfFile, header, section, i);
 			break;
 		}
 	}

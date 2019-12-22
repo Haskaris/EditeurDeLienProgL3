@@ -34,20 +34,17 @@ void osAbi(Elf32_Ehdr h);
 /* Affiche le type du fichier objet
  * arguments : 
  *	- l'entête du fichier ELF (h)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
-void fileType(Elf32_Ehdr h, int bigEndian);
+void fileType(Elf32_Ehdr h);
 
 /* Affiche l'architecture nécessaire à un fichier individuel
  * arguments : 
  *	- l'entête du fichier ELF (h)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
-void machine(Elf32_Ehdr h, int bigEndian);
+void machine(Elf32_Ehdr h);
 
 /* Affiche l'entête d'un fichier ELF
  * arguments : 
  *	- l'entête du fichier ELF (h)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
-void affichage_Entete_Fichier_ELF(Elf32_Ehdr header, int bigEndian);
+void affichage_Entete_Fichier_ELF(Elf32_Ehdr header);

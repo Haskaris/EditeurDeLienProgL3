@@ -4,11 +4,14 @@
 #include <elf.h>
 #include "etape1-5.h"
 
-void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name, int bigEndian){
+void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name){
     Elf32_Shdr table_chaine;
-    fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + byteshift16(header.e_shstrndx, bigEndian) * byteshift16(header.e_shentsize, bigEndian), SEEK_SET);
+    fseek(elfFile, header.e_shoff + header.e_shstrndx * header.e_shentsize, SEEK_SET);
     fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
-    fseek(elfFile,byteshift32(table_chaine.sh_offset, bigEndian) + byteshift32(section.sh_name, bigEndian), SEEK_SET);
+    if (isbigendian(header)){
+	inversion_Sections(&table_chaine);
+    }
+    fseek(elfFile, table_chaine.sh_offset + section.sh_name, SEEK_SET);
     char c=fgetc(elfFile);
     int i=0;
     while(c!='\0'){
@@ -61,7 +64,7 @@ void afficher_relocation_type(int type){
     }
 }
 
-void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header, int bigEndian) {
+void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
   	Elf32_Shdr section;
 
   	char buff[255]; 
@@ -73,41 +76,50 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header, int bigEnd
         // read all section headers
         char nom_section[255];
         //printf("\n%d  %d\n",SHT_REL,SHT_RELA);
-        for (int i = 0; i < byteshift16(header.e_shnum, bigEndian); i++){
-          	fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + i * byteshift16(header.e_shentsize, bigEndian), SEEK_SET);
+        for (int i = 0; i < header.e_shnum; i++){
+          	fseek(elfFile, header.e_shoff + i * header.e_shentsize, SEEK_SET);
           	fread(&section, 1, sizeof(section), elfFile);
+		if (isbigendian(header)){
+			inversion_Sections(&section);
+		}
           	//printf("TYPE : %d\n",section.sh_type);
           	//get_section_name(elfFile,header,section,nom_section);
           	//printf("NOM : %s",nom_section);
-          	if(byteshift32(section.sh_type, bigEndian) == SHT_RELA){
+          	if(section.sh_type == SHT_RELA){
               		Elf32_Rela rela;
-              		get_section_name(elfFile,header,section,nom_section, bigEndian);
-              		int nb_entree=(int)byteshift32(section.sh_size, bigEndian)/sizeof(Elf32_Rela);
-              		printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section,byteshift32(section.sh_offset, bigEndian),nb_entree);
-              		fseek(elfFile,byteshift32(section.sh_offset, bigEndian),SEEK_SET);
+              		get_section_name(elfFile,header, section, nom_section);
+              		int nb_entree=(int)section.sh_size / sizeof(Elf32_Rela);
+              		printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n", nom_section, section.sh_offset, nb_entree);
+              		fseek(elfFile, section.sh_offset, SEEK_SET);
               		for (int i=0;i<nb_entree;i++){
                   		fread(&rela,1,sizeof(rela),elfFile);
-                  		printf("décalage : %012x  ",byteshift32(rela.r_offset, bigEndian));
+				if (isbigendian(header)){
+					inversion_Relation_Additif(&rela);
+				}
+                  		printf("décalage : %012x  ", rela.r_offset);
                   		printf("type : ");
-                  		afficher_relocation_type(ELF32_R_TYPE(byteshift32(rela.r_info, bigEndian)));
+                  		afficher_relocation_type(ELF32_R_TYPE(rela.r_info));
                   		printf("  ");
-                  		printf("index : %u \n",ELF32_R_SYM(byteshift32(rela.r_info, bigEndian)));
+                  		printf("index : %u \n",ELF32_R_SYM(rela.r_info));
               		}
               		printf("\n");
           	} //Verifier si ce n'est pas la même !!!!!!!!!!!!!!!!!
-          	else if(byteshift32(section.sh_type, bigEndian)==SHT_REL){
+          	else if(section.sh_type == SHT_REL){
               		Elf32_Rel rel;
-              		get_section_name(elfFile,header, section, nom_section, bigEndian);
-              		int nb_entree=(int)byteshift32(section.sh_size, bigEndian)/sizeof(Elf32_Rel);
-              		printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section,byteshift32(section.sh_offset, bigEndian),nb_entree);
-              		fseek(elfFile, byteshift32(section.sh_offset, bigEndian), SEEK_SET);
+              		get_section_name(elfFile,header, section, nom_section);
+              		int nb_entree=(int)section.sh_size / sizeof(Elf32_Rel);
+              		printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section, section.sh_offset, nb_entree);
+              		fseek(elfFile, section.sh_offset, SEEK_SET);
               		for (int i=0;i<nb_entree;i++){
                   		fread(&rel,1,sizeof(rel),elfFile);
-                  		printf("décalage : %012x  ",byteshift32(rel.r_offset, bigEndian));
+				if (isbigendian(header)){
+					inversion_Relation_Sans_Additif(&rel);
+				}
+                  		printf("décalage : %012x  ", rel.r_offset);
                   		printf("type : ");
-                  		afficher_relocation_type(ELF32_R_TYPE(byteshift32(rel.r_info, bigEndian)));
+                  		afficher_relocation_type(ELF32_R_TYPE(rel.r_info));
                   		printf("  ");
-                  		printf("index : %u \n",ELF32_R_SYM(byteshift32(rel.r_info, bigEndian)));
+                  		printf("index : %u \n",ELF32_R_SYM(rel.r_info));
               		}
               		printf("\n");
           	}
