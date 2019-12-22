@@ -1,8 +1,8 @@
 //Inclure les autres du .h ?
 #include "etape1-1.h"
 
-void classeArchitecture(Elf32_Ehdr h) {
-	switch (h.e_ident[EI_CLASS]) {
+void classeArchitecture(Elf32_Ehdr header) {
+	switch (header.e_ident[EI_CLASS]) {
 		case ELFCLASS32:
 			printf("ELF32");
 		break;
@@ -14,8 +14,8 @@ void classeArchitecture(Elf32_Ehdr h) {
 	}
 }
 
-void encodage(Elf32_Ehdr h) {
-	switch (h.e_ident[EI_DATA]) {
+void encodage(Elf32_Ehdr header) {
+	switch (header.e_ident[EI_DATA]) {
 		case ELFDATA2LSB:
 			printf("Complément à deux, petit boutien (little endians)");
 			break;
@@ -27,8 +27,8 @@ void encodage(Elf32_Ehdr h) {
 	}
 }
 
-void fileVersion(Elf32_Ehdr h, int addressMode) {
-	switch (h.e_ident[EI_VERSION]) {
+void fileVersion(Elf32_Ehdr header, int addressMode) {
+	switch (header.e_ident[EI_VERSION]) {
 		case EV_CURRENT:
 			if (!addressMode)
 				printf("1 (current)");
@@ -40,8 +40,8 @@ void fileVersion(Elf32_Ehdr h, int addressMode) {
 	}
 }
 
-void osAbi(Elf32_Ehdr h) {
-	switch (h.e_ident[EI_OSABI]) {
+void osAbi(Elf32_Ehdr header) {
+	switch (header.e_ident[EI_OSABI]) {
 		case ELFOSABI_HPUX:
 			printf("HP-UX");
 			break;
@@ -74,8 +74,8 @@ void osAbi(Elf32_Ehdr h) {
 	}
 }
 
-void fileType(Elf32_Ehdr h, int bigEndian) {
-	switch (byteshift16(h.e_type, bigEndian)) {
+void fileType(Elf32_Ehdr header, int bigEndian) {
+	switch (byteshift16(header.e_type, bigEndian)) {
 		case ET_REL:
 			printf("REL (Fichier repositionnable)");
 			break;
@@ -93,8 +93,8 @@ void fileType(Elf32_Ehdr h, int bigEndian) {
 	}
 }
 
-void machine(Elf32_Ehdr h, int bigEndian) {
-	switch (byteshift16(h.e_machine, bigEndian)) {
+void machine(Elf32_Ehdr header, int bigEndian) {
+	switch (byteshift16(header.e_machine, bigEndian)) {
 		case EM_M32:
 			printf("WE 32100 AT&T");
 			break;
