@@ -5,15 +5,7 @@
 #include <string.h>
 #include <elf.h>
 #include "../librairie/lib-bigEndian.h"
-
-/* Lit le nom des sections de la table des entêtes
- * et le renvoit
- * arguments :
- *	- le fichier ELF (elfFile) ouvert
- *	- la table des entêtes du fichier ELF (sh_table)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
-*/
-char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table, int bigEndian);
+#include "../librairie/utils.h"
 
 /* Créer la table des symboles, la lit dans le fichier ELF
  * puis écrit son contenu dans la console

@@ -16,22 +16,6 @@ void foottext(){
 		"ic)\n");
 }
 
-void get_section_name_2(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name, int bigEndian){
-    Elf32_Shdr table_chaine;
-    fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + byteshift16(header.e_shstrndx, bigEndian) * byteshift16(header.e_shentsize, bigEndian), SEEK_SET);
-    fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
-    fseek(elfFile, byteshift32(table_chaine.sh_offset, bigEndian) + byteshift32(section.sh_name, bigEndian), SEEK_SET);
-    char c = fgetc(elfFile);
-    int i=0;
-    while(c!='\0'){
-        name[i]=c;
-        i++;
-
-        c=fgetc(elfFile);
-    }
-    name[i]='\0';
-}
-
 void align(char* str, int indent) {
 	int length = strlen(str);
 	if(length >= indent) return;
@@ -77,6 +61,7 @@ void flagsToString(uint32_t flag) {
 	for (int count = 0; count < i; count++) printf(" ");
 	printf("\t");
 }
+
 void typeToString(uint32_t type) {
 	switch (type) {
 		case SHT_NULL:
@@ -137,9 +122,9 @@ void typeToString(uint32_t type) {
 
 void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header, int bigEndian) {
 	Elf32_Shdr section;
-	char buff[255];
+	
 	// read all section headers
-	printf("Il  y a %d sections dans le fichier.", byteshift16(header.e_shnum, bigEndian));
+	printf("Il y a %d sections dans le fichier.", byteshift16(header.e_shnum, bigEndian));
 	headtext();
 	for (int i = 0; i < byteshift16(header.e_shnum, bigEndian); i++){
 		const char* name = "";
@@ -149,11 +134,11 @@ void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header, int bigEndian) {
 
 		printf("[%2u] ", i);
 
-		char nom_section[255];
-
-		get_section_name_2(elfFile, header, section,nom_section, bigEndian);
+		//Penser à FREE nom_section
+		char* nom_section = get_section_name(elfFile, header, section, bigEndian);
 		printf("%s ",nom_section);
 		align(nom_section, 16);
+		free(nom_section);
 
 		typeToString(byteshift32(section.sh_type, bigEndian));
 		printf("%016x ", byteshift32(section.sh_addr, bigEndian));

@@ -1,22 +1,6 @@
 //Inclure les autres du .h ?
 #include "etape1-5.h"
 
-void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section,
-												char* name, int bigEndian){
-	Elf32_Shdr table_chaine;
-	fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + byteshift16(header.e_shstrndx, bigEndian) * byteshift16(header.e_shentsize, bigEndian), SEEK_SET);
-	fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
-	fseek(elfFile,byteshift32(table_chaine.sh_offset, bigEndian) + byteshift32(section.sh_name, bigEndian), SEEK_SET);
-	char c=fgetc(elfFile);
-	int i=0;
-	while(c!='\0'){
-		name[i]=c;
-		i++;
-		c=fgetc(elfFile);
-	}
-	name[i]='\0';
-}
-
 void afficher_relocation_type(int type){
 	switch(type){
 		case 0:
@@ -63,13 +47,16 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header,
 	Elf32_Shdr section;
 
   // read all section headers
-  char nom_section[255];
+  //char nom_section[255];
 	for (int i = 0; i < byteshift16(header.e_shnum, bigEndian); i++){
 		fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + i * byteshift16(header.e_shentsize, bigEndian), SEEK_SET);
 		fread(&section, 1, sizeof(section), elfFile);
 		if(byteshift32(section.sh_type, bigEndian) == SHT_RELA){
 			Elf32_Rela rela;
-			get_section_name(elfFile,header,section,nom_section, bigEndian);
+
+			//Penser à free
+			char* nom_section = get_section_name(elfFile, header, section, bigEndian);
+
 			int nb_entree=(int)byteshift32(section.sh_size, bigEndian)/sizeof(Elf32_Rela);
 			printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section,byteshift32(section.sh_offset, bigEndian),nb_entree);
 			fseek(elfFile,byteshift32(section.sh_offset, bigEndian),SEEK_SET);
@@ -85,7 +72,10 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header,
 		} //Verifier si ce n'est pas la même !!!
 		else if(byteshift32(section.sh_type, bigEndian)==SHT_REL){
 			Elf32_Rel rel;
-			get_section_name(elfFile,header, section, nom_section, bigEndian);
+
+			//Penser à free
+			char* nom_section = get_section_name(elfFile, header, section, bigEndian);
+
 			int nb_entree=(int)byteshift32(section.sh_size, bigEndian)/sizeof(Elf32_Rel);
 			printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section,byteshift32(section.sh_offset, bigEndian),nb_entree);
 			fseek(elfFile, byteshift32(section.sh_offset, bigEndian), SEEK_SET);
@@ -97,6 +87,7 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header,
 				printf("  ");
 				printf("index : %u \n",ELF32_R_SYM(byteshift32(rel.r_info, bigEndian)));
 			}
+			free(nom_section);
 			printf("\n");
 		}
 	}

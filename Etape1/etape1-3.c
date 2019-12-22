@@ -1,25 +1,8 @@
 //Inclure les autres du .h ?
 #include "etape1-3.h"
 
-void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name, int bigEndian){
-    Elf32_Shdr table_chaine;
-    fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + byteshift16(header.e_shstrndx, bigEndian) * byteshift16(header.e_shentsize, bigEndian), SEEK_SET);
-    fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
-    fseek(elfFile, byteshift32(table_chaine.sh_offset, bigEndian) + byteshift32(section.sh_name, bigEndian), SEEK_SET);
-    char c=fgetc(elfFile);
-    int i=0;
-    while(c!='\0'){
-        name[i]=c;
-        i++;
-        c=fgetc(elfFile);
-    }
-    name[i]='\0';
-
-}
-
 void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int bigEndian, int numSection) {
 	Elf32_Shdr section;
-	char tableName[255];
 
 	// Lit toutes les sections, et se décale sur la section demandée
 	int i = 0;
@@ -32,10 +15,11 @@ void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int bigEndian, 
 		fread(&section, 1, sizeof(section), elfFile);
 
 		//Récupère le nom de la section
-		get_section_name_3(elfFile, header, section, tableName, bigEndian);
-
+		//Penser à free
+		char* tableName = get_section_name(elfFile, header, section, bigEndian);
 		printf("Vidange hexadécimale de la section << %s >> :\n", tableName);
-
+		free(tableName);
+		
 		for(int j = 0; j < byteshift32(section.sh_size, bigEndian); j+=16) {
 			fseek(elfFile,byteshift32(section.sh_offset, bigEndian)+j,SEEK_SET);
 			printf("  0x%08x ", j);

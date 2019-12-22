@@ -1,13 +1,13 @@
 //Inclure les autres du .h ?
 #include "etape1-4.h"
 
-char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table, int bigEndian) {
+/*char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table, int bigEndian) {
 	//Lire les noms des sections
 	char *nom = malloc(byteshift32(sh_table.sh_size, bigEndian));
 	fseek(elfFile, byteshift32(sh_table.sh_offset, bigEndian), SEEK_SET);
 	fread(nom, 1, byteshift32(sh_table.sh_size, bigEndian), elfFile);
 	return nom;
-}
+}*/
 
 void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table,
 														uint32_t indice, int bigEndian){
