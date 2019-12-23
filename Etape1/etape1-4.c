@@ -4,42 +4,42 @@
 #include <elf.h>
 #include "etape1-4.h"
 
-char* get_section_names(FILE *elfFile, Elf32_Shdr sh_table)
+char* get_section_names(FILE *elfFile, Elf32_Shdr section)
 {
     //Lire les noms des sections
-    char *nom = malloc(sh_table.sh_size);
-    fseek(elfFile, sh_table.sh_offset, SEEK_SET);
-    fread(nom, 1, sh_table.sh_size, elfFile);
+    char *nom = malloc(section.TAILLE_SECTION);
+    fseek(elfFile, section.DECALAGE_DEBUT_FICHIER, SEEK_SET);
+    fread(nom, 1, section.TAILLE_SECTION, elfFile);
     return nom;
 }
 
-void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uint32_t indice){	
-	Elf32_Sym sym_tbl;
+void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, uint32_t indice){	
+	Elf32_Sym table_symbole;
 	uint32_t i, nombre_symbol;
 	//accéde à la table des symboles
-	fseek(elfFile, eh.e_shoff + indice * sizeof(sh_table), SEEK_SET);
-	fread(&sh_table, 1, sizeof(sh_table), elfFile);
+	fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + indice * sizeof(section), SEEK_SET);
+	fread(&section, 1, sizeof(section), elfFile);
   	//printf("Name : %s\n",get_section_names(elfFile, sh_table, bigEndian) + sh_table.sh_name);
-	if (isbigendian(eh)){
-		inversion_Sections(&sh_table);
+	if (isbigendian(header)){
+		inversion_Sections(&section);
     	}
 	// calcul du nombre de symbole   	
-	nombre_symbol = sh_table.sh_size / sh_table.sh_entsize;
-  	fseek(elfFile, sh_table.sh_offset, SEEK_SET);
+	nombre_symbol = section.TAILLE_SECTION / section.TAILLE_TABLE_ENTREE_FIXE;
+  	fseek(elfFile, section.DECALAGE_DEBUT_FICHIER, SEEK_SET);
 
 	printf("La table de symboles << .symtab >> contient %d entrées :\n", nombre_symbol);
 	printf("  Num:   Valeur     Tail  Type  Lien  Vis     Ndx Nom\n");
         
 	//on affiche les informations du symbole
 	for(i=0; i< nombre_symbol; i++) {
-		fread(&sym_tbl, 1, sizeof(sym_tbl), elfFile);
-		if (isbigendian(eh)){
-			insersion_Table_Symbole(&sym_tbl);
+		fread(&table_symbole, 1, sizeof(table_symbole), elfFile);
+		if (isbigendian(header)){
+			insersion_Table_Symbole(&table_symbole);
 		}
 		printf("   %d:",i);
-		printf("  %08x ", sym_tbl.st_value);
-		printf(" %u ", sym_tbl.st_size);
-		switch (ELF32_ST_TYPE(sym_tbl.st_info)) {
+		printf("  %08x ", table_symbole.VALEUR_SYMBOLE);
+		printf(" %u ", table_symbole.TAILLE_SYMBOLE);
+		switch (ELF32_ST_TYPE(table_symbole.TYPE_SYMBOLE_ET_ATTRIBUT_LIAISON)) {
         		case 0:
             			printf("  NOTYPE  ");
             			break;
@@ -59,7 +59,7 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uin
        			default: printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_table32 switch ELF32_ST_TYPE ");
             			break;
     		}
-		switch(ELF32_ST_BIND(sym_tbl.st_info))
+		switch(ELF32_ST_BIND(table_symbole.TYPE_SYMBOLE_ET_ATTRIBUT_LIAISON))
     		{
        	 		case 0: printf(" LOCAL ");
             			break;
@@ -73,7 +73,7 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uin
         			break;
     		}
 		//printf(" %x  ", sym_tbl.st_other);
-		switch(ELF32_ST_VISIBILITY(sym_tbl.st_other)){
+		switch(ELF32_ST_VISIBILITY(table_symbole.VISIBILITE_SYMBOLE)){
 			case 0: printf(" DEFAULT ");
 				break;
 			case 1: printf(" INTERNAL ");
@@ -85,8 +85,8 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uin
 			default: printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_table64 switch ELF64_ST_VISIBILITY ");
 				break;
 		}
-    		printf(" %x  ", sym_tbl.st_shndx);
-    		printf(" %02x\n", sym_tbl.st_name);	
+    		printf(" %x  ", table_symbole.INDICE_TABLE_SECTION);
+    		printf(" %02x\n", table_symbole.NOM_SYMBOLE);	
 	}
 }
 
@@ -96,13 +96,13 @@ void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header) {
 	Elf32_Shdr section;
 	//parcours la table des entêtes et 
 	//cherche la section contenant la table des symboles (SHT_SYMTAB)		
-	for(i=0; i<header.e_shnum; i++) {
-		fseek(elfFile, header.e_shoff + i * sizeof(section), SEEK_SET);
+	for(i=0; i < header.NOMBRE_ENTREE_TABLE_SECTIONS; i++) {
+		fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(section), SEEK_SET);
          	fread(&section, 1, sizeof(section), elfFile);
 		if (isbigendian(header)){
 			inversion_Sections(&section);
 		}
-		if (section.sh_type ==SHT_SYMTAB) {
+		if (section.CONTENU_SEMANTIQUE ==SHT_SYMTAB) {
 			print_symbol_table32(elfFile, header, section, i);
 			break;
 		}

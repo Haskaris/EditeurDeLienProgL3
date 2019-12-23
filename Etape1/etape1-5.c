@@ -4,14 +4,15 @@
 #include <elf.h>
 #include "etape1-5.h"
 
-void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name){
+void get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name){
     Elf32_Shdr table_chaine;
-    fseek(elfFile, header.e_shoff + header.e_shstrndx * header.e_shentsize, SEEK_SET);
+    long adresse = header.DECALAGE_TABLE_ENTETE_SECTIONS + header.INDICE_TABLE_ENTETE_SECTIONS * header.TAILLE_ENTETE_SECTION;
+    fseek(elfFile, adresse, SEEK_SET);
     fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
     if (isbigendian(header)){
 	inversion_Sections(&table_chaine);
     }
-    fseek(elfFile, table_chaine.sh_offset + section.sh_name, SEEK_SET);
+    fseek(elfFile, table_chaine.DECALAGE_DEBUT_FICHIER + section.NOM_SECTION, SEEK_SET);
     char c=fgetc(elfFile);
     int i=0;
     while(c!='\0'){
@@ -76,8 +77,10 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
         // read all section headers
         char nom_section[255];
         //printf("\n%d  %d\n",SHT_REL,SHT_RELA);
-        for (int i = 0; i < header.e_shnum; i++){
-          	fseek(elfFile, header.e_shoff + i * header.e_shentsize, SEEK_SET);
+        long adresse = 0;
+        for (int i = 0; i < header.NOMBRE_ENTREE_TABLE_SECTIONS; i++){
+		adresse = header.DECALAGE_TABLE_ENTETE_SECTIONS + i * header.TAILLE_ENTETE_SECTION;
+          	fseek(elfFile, adresse, SEEK_SET);
           	fread(&section, 1, sizeof(section), elfFile);
 		if (isbigendian(header)){
 			inversion_Sections(&section);
@@ -85,41 +88,45 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
           	//printf("TYPE : %d\n",section.sh_type);
           	//get_section_name(elfFile,header,section,nom_section);
           	//printf("NOM : %s",nom_section);
-          	if(section.sh_type == SHT_RELA){
+          	if(section.CONTENU_SEMANTIQUE == SHT_RELA){
               		Elf32_Rela rela;
-              		get_section_name(elfFile,header, section, nom_section);
-              		int nb_entree=(int)section.sh_size / sizeof(Elf32_Rela);
-              		printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n", nom_section, section.sh_offset, nb_entree);
-              		fseek(elfFile, section.sh_offset, SEEK_SET);
-              		for (int i=0;i<nb_entree;i++){
+              		get_section_name(elfFile, header, section, nom_section);
+              		int nb_entree=(int)section.TAILLE_SECTION / sizeof(Elf32_Rela);
+              		printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n", nom_section, section.DECALAGE_DEBUT_FICHIER, nb_entree);
+              		fseek(elfFile, section.DECALAGE_DEBUT_FICHIER, SEEK_SET);
+              		for (int i=0; i < nb_entree; i++){
                   		fread(&rela,1,sizeof(rela),elfFile);
 				if (isbigendian(header)){
 					inversion_Relation_Additif(&rela);
 				}
-                  		printf("décalage : %012x  ", rela.r_offset);
+                  		printf("décalage : %012x  ", rela.EMPLACEMENT_REPOSITIONNEMENT);
                   		printf("type : ");
-                  		afficher_relocation_type(ELF32_R_TYPE(rela.r_info));
+              	    		afficher_relocation_type(ELF32_R_TYPE( \
+						rela.INDICE_SYMBOLE_ET_TYPE_REPOSITIONNEMENT));
                   		printf("  ");
-                  		printf("index : %u \n",ELF32_R_SYM(rela.r_info));
+                  		printf("index : %u \n", ELF32_R_SYM( \
+						rela.INDICE_SYMBOLE_ET_TYPE_REPOSITIONNEMENT));
               		}
               		printf("\n");
           	} //Verifier si ce n'est pas la même !!!!!!!!!!!!!!!!!
           	else if(section.sh_type == SHT_REL){
               		Elf32_Rel rel;
-              		get_section_name(elfFile,header, section, nom_section);
-              		int nb_entree=(int)section.sh_size / sizeof(Elf32_Rel);
+              		get_section_name(elfFile, header, section, nom_section);
+              		int nb_entree=(int)section.TAILLE_SECTION / sizeof(Elf32_Rel);
               		printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section, section.sh_offset, nb_entree);
-              		fseek(elfFile, section.sh_offset, SEEK_SET);
-              		for (int i=0;i<nb_entree;i++){
+              		fseek(elfFile, section.DECALAGE_DEBUT_FICHIER, SEEK_SET);
+              		for (int i=0; i < nb_entree; i++){
                   		fread(&rel,1,sizeof(rel),elfFile);
 				if (isbigendian(header)){
 					inversion_Relation_Sans_Additif(&rel);
 				}
-                  		printf("décalage : %012x  ", rel.r_offset);
+                  		printf("décalage : %012x  ", rel.EMPLACEMENT_REPOSITIONNEMENT);
                   		printf("type : ");
-                  		afficher_relocation_type(ELF32_R_TYPE(rel.r_info));
+                  		afficher_relocation_type(ELF32_R_TYPE( \
+						rel.INDICE_SYMBOLE_ET_TYPE_REPOSITIONNEMENT));
                   		printf("  ");
-                  		printf("index : %u \n",ELF32_R_SYM(rel.r_info));
+                  		printf("index : %u \n",ELF32_R_SYM( \
+						rel.INDICE_SYMBOLE_ET_TYPE_REPOSITIONNEMENT));
               		}
               		printf("\n");
           	}

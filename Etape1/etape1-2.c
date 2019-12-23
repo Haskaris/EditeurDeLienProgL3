@@ -15,13 +15,14 @@ void foottext(){
 
 void get_section_name_2(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name){
     Elf32_Shdr table_chaine;
-    fseek(elfFile, header.e_shoff + header.e_shstrndx * header.e_shentsize, SEEK_SET);
+    long adresse = header.DECALAGE_TABLE_ENTETE_SECTIONS + (header.INDICE_TABLE_ENTETE_SECTIONS * header.TAILLE_ENTETE_SECTION);
+    fseek(elfFile, adresse, SEEK_SET);
     fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
     //Si le fichier ELF n'est pas en litle Endian on l'inverse
     if (isbigendian(header)){
 	inversion_Sections(&table_chaine);
     }
-    fseek(elfFile, table_chaine.sh_offset + section.sh_name, SEEK_SET);
+    fseek(elfFile, table_chaine.DECALAGE_DEBUT_FICHIER + section.NOM_SECTION, SEEK_SET);
 
     char c = fgetc(elfFile);
     int i=0;
@@ -150,10 +151,10 @@ void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header) {
         // read all section headers
         printf("Il  y a %d sections dans le fichier.", header.e_shnum);
         headtext();
-        for (int i = 0; i < header.e_shnum; i++){
+        for (int i = 0; i < header.NOMBRE_ENTREE_TABLE_SECTIONS; i++){
           	const char* name = "";
 
-          	fseek(elfFile, header.e_shoff + i * sizeof(section), SEEK_SET);
+          	fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(section), SEEK_SET);
           	fread(&section, 1, sizeof(section), elfFile);
 		//Si le fichier ELF n'est pas en litle Endian on l'inverse
 		if (isbigendian(header)){
@@ -173,15 +174,15 @@ void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header) {
           	printf("%s ",nom_section);
           	align(nom_section, 16);
 
-          	typeToString(section.sh_type);
-          	printf("%016x ", section.sh_addr);
-          	printf("%08x\n     ", section.sh_offset);
-          	printf("%016x ", section.sh_size);
-          	printf("%016x ", section.sh_entsize);
-          	flagsToString(section.sh_flags);
-          	printf("%u\t", section.sh_link);
-          	printf("%u\t", section.sh_info);
-          	printf("%u\n", section.sh_addralign);
+          	typeToString(section.CONTENU_SEMANTIQUE);
+          	printf("%016x ", section.ADRESSE_MEMOIRE);
+          	printf("%08x\n     ", section.DECALAGE_DEBUT_FICHIER);
+          	printf("%016x ", section.TAILLE_SECTION);
+          	printf("%016x ", section.TAILLE_TABLE_ENTREE_FIXE);
+          	flagsToString(section.DRAPEAUX_ATTRIBUTS);
+          	printf("%u\t", section.LIEN_INDICE_TABLE_SECTION);
+          	printf("%u\t", section.INFORMATIONS_COMPLEMENTAIRES);
+          	printf("%u\n", section.CONTRAINTE_D_ALIGNEMENT);
         }
         foottext();
 }

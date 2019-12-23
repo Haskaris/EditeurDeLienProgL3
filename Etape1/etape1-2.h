@@ -3,6 +3,9 @@
 #include <string.h>
 #include <elf.h>
 #include "../librairie/lib-bigEndian.h"
+#include "../librairie/macro_header.h"
+#include "../librairie/macro_symbole.h"
+#include "../librairie/macro_section.h"
 
 /* Affiche l'entête pour l'affichage des entêtes
 */
