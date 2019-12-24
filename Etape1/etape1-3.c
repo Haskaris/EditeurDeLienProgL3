@@ -5,11 +5,16 @@
 #include "etape1-3.h"
 
 
-void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name, int bigEndian){
+void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name){
     Elf32_Shdr table_chaine;
-    fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + byteshift16(header.e_shstrndx, bigEndian) * byteshift16(header.e_shentsize, bigEndian), SEEK_SET);
+    long adresse = header.DECALAGE_TABLE_ENTETE_SECTIONS + header.INDICE_TABLE_ENTETE_SECTIONS * header.TAILLE_ENTETE_SECTION;
+    fseek(elfFile, adresse, SEEK_SET);
     fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
-    fseek(elfFile, byteshift32(table_chaine.sh_offset, bigEndian) + byteshift32(section.sh_name, bigEndian), SEEK_SET);
+    //Inversion de la table si elle n'est pas en litle Endian
+    if (isbigendian(header)){
+	inversion_Sections(&table_chaine);
+    }
+    fseek(elfFile, table_chaine.DECALAGE_DEBUT_FICHIER + section.NOM_SECTION, SEEK_SET);
     char c=fgetc(elfFile);
     int i=0;
     while(c!='\0'){
@@ -21,7 +26,7 @@ void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, ch
 
 }
 
-void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int bigEndian, int numSection) {
+void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int numSection) {
   	Elf32_Shdr section;
   	char tableName[255];
 
@@ -29,24 +34,27 @@ void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int bigEndian, 
 
         // Lit toutes les sections, et se décale sur la section demandée
         int i = 0;
-        while (i <= byteshift16(header.e_shnum, bigEndian) && i < numSection)
+        while (i <= header.NOMBRE_ENTREE_TABLE_SECTIONS && i < numSection)
           i++;
 
-        if (i <= byteshift16(header.e_shnum, bigEndian)) {
+        if (i <= header.NOMBRE_ENTREE_TABLE_SECTIONS) {
           	//Lit la section
-	  	fseek(elfFile, byteshift32(header.e_shoff, bigEndian) + i * sizeof(section), SEEK_SET);
+	  	fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(section), SEEK_SET);
           	fread(&section, 1, sizeof(section), elfFile);
-
+		//Inversion de la table si elle n'est pas en litle Endian
+   	 	if (isbigendian(header)){
+			inversion_Sections(&section);
+    		}
           	//Récupère le nom de la section
-          	get_section_name_3(elfFile, header, section, tableName, bigEndian);
+          	get_section_name_3(elfFile, header, section, tableName);
 	
           	printf("Vidange hexadécimale de la section << %s >> :\n", tableName);
 
-          	for(int j = 0; j < byteshift32(section.sh_size, bigEndian); j+=16) {
-            		fseek(elfFile,byteshift32(section.sh_offset, bigEndian)+j,SEEK_SET);
+          	for(int j = 0; j < section.TAILLE_SECTION; j+=16) {
+            		fseek(elfFile, section.DECALAGE_DEBUT_FICHIER + j, SEEK_SET);
             		printf("  0x%08x ", j);
             		for (int k = 0; k < 16; k++){
-              			if (j+k == byteshift32(section.sh_size, bigEndian)) {
+              			if (j+k == section.TAILLE_SECTION) {
                 			for (int o = k; o < 16; o++) {
                   				printf("  ");
                   				if (o == 3 || o == 7 || o == 11)
@@ -61,9 +69,9 @@ void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int bigEndian, 
                 			printf(" ");
              		}
              		printf(" ");
-             		fseek(elfFile,byteshift32(section.sh_offset, bigEndian)+j,SEEK_SET);
+             		fseek(elfFile, section.DECALAGE_DEBUT_FICHIER + j, SEEK_SET);
              		for (int k = 0; k < 16; k++){
-               			if (j+k == byteshift32(section.sh_size, bigEndian)) {
+               			if (j+k == section.TAILLE_SECTION) {
                  			break;
                			}
                			unsigned char c;
