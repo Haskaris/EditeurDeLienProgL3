@@ -4,8 +4,8 @@
 #include <elf.h>
 #include "etape1-1.h"
 
-void classeArchitecture(Elf32_Ehdr h) {
-  switch (h.e_ident[EI_CLASS]) {
+void classeArchitecture(Elf32_Ehdr header) {
+  switch (header.e_ident[EI_CLASS]) {
     case ELFCLASS32:
       printf("ELF32");
     break;
@@ -17,8 +17,8 @@ void classeArchitecture(Elf32_Ehdr h) {
   }
 }
 
-void encodage(Elf32_Ehdr h) {
-  switch (h.e_ident[EI_DATA]) {
+void encodage(Elf32_Ehdr header) {
+  switch (header.e_ident[EI_DATA]) {
     case ELFDATA2LSB:
       printf("Complément à deux, petit boutien (little endians)");
     break;
@@ -30,8 +30,8 @@ void encodage(Elf32_Ehdr h) {
   }
 }
 
-void fileVersion(Elf32_Ehdr h, int addressMode) {
-  switch (h.e_ident[EI_VERSION]) {
+void fileVersion(Elf32_Ehdr header, int addressMode) {
+  switch (header.e_ident[EI_VERSION]) {
     case EV_CURRENT:
       if (!addressMode)
         printf("1 (current)");
@@ -43,8 +43,8 @@ void fileVersion(Elf32_Ehdr h, int addressMode) {
   }
 }
 
-void osAbi(Elf32_Ehdr h) {
-  switch (h.e_ident[EI_OSABI]) {
+void osAbi(Elf32_Ehdr header) {
+  switch (header.e_ident[EI_OSABI]) {
     case ELFOSABI_HPUX:
       printf("HP-UX");
     break;
@@ -77,8 +77,8 @@ void osAbi(Elf32_Ehdr h) {
   }
 }
 
-void fileType(Elf32_Ehdr h, int bigEndian) {
-  switch (byteshift16(h.e_type, bigEndian)) {
+void fileType(Elf32_Ehdr header) {
+  switch (header.e_type) {
     case ET_REL:
       printf("REL (Fichier repositionnable)");
     break;
@@ -96,8 +96,8 @@ void fileType(Elf32_Ehdr h, int bigEndian) {
   }
 }
 
-void machine(Elf32_Ehdr h, int bigEndian) {
-  switch (byteshift16(h.e_machine, bigEndian)) {
+void machine(Elf32_Ehdr header) {
+  switch (header.e_machine) {
     case EM_M32:
       printf("WE 32100 AT&T");
     break;
@@ -157,7 +157,7 @@ void machine(Elf32_Ehdr h, int bigEndian) {
   }
 }
 
-void affichage_Entete_Fichier_ELF(Elf32_Ehdr header, int bigEndian) {
+void affichage_Entete_Fichier_ELF(Elf32_Ehdr header) {
   	char buff[255];
 
   	printf("En-tête ELF:\n  Magique:\t");
@@ -179,22 +179,22 @@ void affichage_Entete_Fichier_ELF(Elf32_Ehdr header, int bigEndian) {
         printf("\n  Version ABI:\t\t\t\t%d",header.e_ident[EI_ABIVERSION]);
 
         printf("\n  Type:\t\t\t\t");
-        fileType(header, bigEndian);
+        fileType(header);
 
         printf("\n  Machine:\t\t\t\t\t");
-        machine(header, bigEndian);
+        machine(header);
 
         printf("\n  Version:\t\t\t\t");
         fileVersion(header, 1);
 
         printf("\n  Adresse du point d'entrée:\t\t%01x", header.e_ident[EI_PAD]);
-        printf("\n  Début des en-tête de programme:\t%u", byteshift32(header.e_phoff, bigEndian));
-        printf("\n  Début des en-tête de section:\t\t%u", byteshift32(header.e_shoff, bigEndian));
-        printf("\n  Fanions:\t\t\t\t0x%01x", byteshift32(header.e_flags, bigEndian));
-        printf("\n  Taille de cet en-tête:\t\t%d (octets)", byteshift16(header.e_ehsize, bigEndian));
-        printf("\n  Taille de l'en-tête du programme:\t%d (octets)", byteshift16(header.e_phentsize, bigEndian));
-        printf("\n  Nombre d'en-tête du programme:\t%d", byteshift16(header.e_phnum, bigEndian));
-        printf("\n  Taille des en-têtes de section:\t%d (octets)", byteshift16(header.e_shentsize, bigEndian));
-        printf("\n  Nombre d'en-têtes de section:\t\t%d", byteshift16(header.e_shnum, bigEndian));
-        printf("\n  Table d'indexes des chaînes d'en-tête de section:\t%d\n", byteshift16(header.e_shstrndx, bigEndian));
+        printf("\n  Début des en-tête de programme:\t%u", header.e_phoff);
+        printf("\n  Début des en-tête de section:\t\t%u", header.e_shoff);
+        printf("\n  Fanions:\t\t\t\t0x%01x", header.e_flags);
+        printf("\n  Taille de cet en-tête:\t\t%d (octets)", header.e_ehsize);
+        printf("\n  Taille de l'en-tête du programme:\t%d (octets)", header.e_phentsize);
+        printf("\n  Nombre d'en-tête du programme:\t%d", header.e_phnum);
+        printf("\n  Taille des en-têtes de section:\t%d (octets)", header.e_shentsize);
+        printf("\n  Nombre d'en-têtes de section:\t\t%d", header.e_shnum);
+        printf("\n  Table d'indexes des chaînes d'en-tête de section:\t%d\n", header.e_shstrndx);
 }

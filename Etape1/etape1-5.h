@@ -3,6 +3,10 @@
 #include <string.h>
 #include <elf.h>
 #include "../librairie/lib-bigEndian.h"
+#include "../librairie/macro_section.h"
+#include "../librairie/macro_symbole.h"
+#include "../librairie/macro_header.h"
+#include "../librairie/macro_repositionnement.h"
 
 /* Lit le nom des sections de la table des entêtes
  * et le renvoit
@@ -10,9 +14,8 @@
  *	- le fichier ELF (elfFile) ouvert
  *	- l'entête du fichier ELF (header)
  *	- la table des sections du fichier ELF (sh_table)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
-void get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name, int bigEndian);
+void get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name);
 
 /* Affiche le type de repositionnement à appliquer
  * arguments :
@@ -24,6 +27,5 @@ void afficher_relocation_type(int type);
  * arguments :
  *	- le fichier ELF (elfFile) ouvert
  *	- l'entête du fichier ELF (header)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
 */
-void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header, int bigEndian);
+void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header);
