@@ -18,7 +18,7 @@
  *	- l'entête du fichier ELF (header)
  *	- la table des sections du fichier ELF (sh_table)
 */
-void get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name);
+//void get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name);
 
 /* Affiche le type de repositionnement à appliquer
  * arguments :
@@ -32,4 +32,4 @@ void afficher_relocation_type(int type);
  *	- l'entête du fichier ELF (header)
 */
 void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header);
-#endif
+#endif /* __ETAPE1_5_H__ */

@@ -1,14 +1,14 @@
 //Inclure les autres du .h ?
 #include "etape1-4.h"
 
-char* get_section_names(FILE *elfFile, Elf32_Shdr section)
+/*char* get_section_names(FILE *elfFile, Elf32_Shdr section)
 {
     //Lire les noms des sections
     char *nom = malloc(section.TAILLE_SECTION);
     fseek(elfFile, section.DECALAGE_DEBUT_FICHIER, SEEK_SET);
     fread(nom, 1, section.TAILLE_SECTION, elfFile);
     return nom;
-}
+}*/
 
 void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, uint32_t indice){
 	Elf32_Sym table_symbole;
@@ -19,15 +19,10 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
   	//printf("Name : %s\n",get_section_names(elfFile, sh_table, bigEndian) + sh_table.sh_name);
 	if (isbigendian(header)){
 		inversion_Sections(&section);
-    	}
+	}
 	// calcul du nombre de symbole
 	nombre_symbol = section.TAILLE_SECTION / section.TAILLE_TABLE_ENTREE_FIXE;
   	fseek(elfFile, section.DECALAGE_DEBUT_FICHIER, SEEK_SET);
-
-	// calcul du nombre de symbole
-	nombre_symbol = byteshift32(sh_table.sh_size, bigEndian) /
-										byteshift32(sh_table.sh_entsize, bigEndian);
-	fseek(elfFile, byteshift32(sh_table.sh_offset, bigEndian), SEEK_SET);
 
 	printf("La table de symboles << .symtab >> contient %d entrées :\n",
 		nombre_symbol);

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
+#include "../librairie/utils.h"
 #include "../librairie/lib-bigEndian.h"
 #include "../librairie/macro_header.h"
 #include "../librairie/macro_symbole.h"
@@ -24,7 +25,7 @@ void foottext();
  *	- la table des sections du fichier ELF (section)
  *	- tableau des noms (name)
 */
-void get_section_name_2(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name);
+//void get_section_name_2(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name);
 
 /* Affiche l'indentation nécessaire
  * arguments :
@@ -52,4 +53,4 @@ void typeToString(uint32_t type);
  *	- entête du fichier ELF (header)
 */
 void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header);
-#endif
+#endif  /* __ETAPE1_2_H__ */

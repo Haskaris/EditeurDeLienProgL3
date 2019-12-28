@@ -1,3 +1,5 @@
+#ifndef __ETAPE1_PRINCIPAL_H__
+#define __ETAPE1_PRINCIPAL_H__
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,3 +19,4 @@
 /* Contient la fonction main qui se chargera d'appeler les
  * fonctions voulues
 */
+#endif /* __ETAPE1_PRINCIPAL_H__ */

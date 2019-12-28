@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
+#include "../librairie/utils.h"
 #include "../librairie/lib-bigEndian.h"
 #include "../librairie/macro_section.h"
 #include "../librairie/macro_symbole.h"
@@ -16,7 +17,7 @@
  *	- la table des entêtes du fichier ELF (section)
  *	- nom de la table (name)
 */
-void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name);
+//void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name);
 
 /* Affiche le contenu d'une section
  * arguments :
@@ -25,4 +26,4 @@ void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, ch
  *	- entier qui correspond au numéro de la section que l'on veut afficher (numSection)
 */
 void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int numSection);
-#endif
+#endif  /* __ETAPE1_3_H__ */

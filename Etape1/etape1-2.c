@@ -13,7 +13,7 @@ void foottext(){
 
 }
 
-void get_section_name_2(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name){
+/*void get_section_name_2(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name){
     Elf32_Shdr table_chaine;
     long adresse = header.DECALAGE_TABLE_ENTETE_SECTIONS + (header.INDICE_TABLE_ENTETE_SECTIONS * header.TAILLE_ENTETE_SECTION);
     fseek(elfFile, adresse, SEEK_SET);
@@ -33,7 +33,7 @@ void get_section_name_2(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char
         c=fgetc(elfFile);
     }
     name[i]='\0';
-}
+}*/
 
 void align(char* str, int indent) {
 	int length = strlen(str);
@@ -165,12 +165,12 @@ void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header) {
           	//if (sectHdr.sh_name)
           	//  name = SectNames + sectHdr.sh_name;
 
-          	char nom_section[255];
+          	//char nom_section[255];
+          	//get_section_name_2(elfFile, header, section, nom_section);
 
-
-
-          	get_section_name_2(elfFile, header, section, nom_section);
-          	printf("%s ",nom_section);
+						char* nom_section = NULL;
+						nom_section = get_section_name(elfFile, header, section);
+						printf("%s ",nom_section);
           	align(nom_section, 16);
 
           	typeToString(section.CONTENU_SEMANTIQUE);

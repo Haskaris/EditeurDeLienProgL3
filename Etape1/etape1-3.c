@@ -2,7 +2,7 @@
 #include "etape1-3.h"
 
 
-void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name){
+/*void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name){
     Elf32_Shdr table_chaine;
     long adresse = header.DECALAGE_TABLE_ENTETE_SECTIONS + header.INDICE_TABLE_ENTETE_SECTIONS * header.TAILLE_ENTETE_SECTION;
     fseek(elfFile, adresse, SEEK_SET);
@@ -21,11 +21,11 @@ void get_section_name_3(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, ch
     }
     name[i]='\0';
 
-}
+}*/
 
 void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int numSection) {
   	Elf32_Shdr section;
-  	char tableName[255];
+  	//char tableName[255];
 
   	char buff[255];
 
@@ -43,8 +43,9 @@ void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int numSection)
 			inversion_Sections(&section);
     		}
           	//Récupère le nom de la section
-          	get_section_name_3(elfFile, header, section, tableName);
-
+          	//get_section_name_3(elfFile, header, section, tableName);
+						char* tableName = NULL;
+						tableName = get_section_name(elfFile, header, section);
           	printf("Vidange hexadécimale de la section << %s >> :\n", tableName);
 
           	for(int j = 0; j < section.TAILLE_SECTION; j+=16) {

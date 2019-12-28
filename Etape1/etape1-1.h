@@ -1,10 +1,6 @@
 #ifndef __ETAPE1_1_H__
 #define __ETAPE1_1_H__
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <elf.h>
-#include "../librairie/lib-bigEndian.h"
 
 /* Affiche la classe du fichier ELF, 32 ou 64 bits
  * arguments :
@@ -51,4 +47,4 @@ void machine(Elf32_Ehdr header);
 */
 void affichage_Entete_Fichier_ELF(Elf32_Ehdr header);
 
-#endif
+#endif  /* __ETAPE1_1_H__ */
