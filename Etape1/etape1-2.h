@@ -1,5 +1,6 @@
 #ifndef __ETAPE1_2_H__
 #define __ETAPE1_2_H__
+//TODO: nettoyer les includes
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,15 +18,6 @@ void headtext();
 /* Affichage du bas de l'entête
 */
 void foottext();
-
-/* Récupére le nom des sections de la table des sections
- * arguments :
- *	- le fichier ELF (elfFile) ouvert
- *	- entête du fichier ELF (header)
- *	- la table des sections du fichier ELF (section)
- *	- tableau des noms (name)
-*/
-//void get_section_name_2(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name);
 
 /* Affiche l'indentation nécessaire
  * arguments :
