@@ -1,28 +1,8 @@
 //Inclure les autres du .h ?
 #include "etape1-5.h"
 
-/*void get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name){
-    Elf32_Shdr table_chaine;
-    long adresse = header.DECALAGE_TABLE_ENTETE_SECTIONS + header.INDICE_TABLE_ENTETE_SECTIONS * header.TAILLE_ENTETE_SECTION;
-    fseek(elfFile, adresse, SEEK_SET);
-    fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
-    if (isbigendian(header)){
-	inversion_Sections(&table_chaine);
-    }
-    fseek(elfFile, table_chaine.DECALAGE_DEBUT_FICHIER + section.NOM_SECTION, SEEK_SET);
-    char c=fgetc(elfFile);
-    int i=0;
-    while(c!='\0'){
-        name[i]=c;
-        i++;
-        c=fgetc(elfFile);
-    }
-    name[i]='\0';
-
-}*/
-
-void afficher_relocation_type(int type){
-	switch(type){
+void afficher_relocation_type(int type) {
+	switch(type) {
 		case 0:
 			printf("R_ARM_NONE");
 			break;
@@ -65,7 +45,7 @@ void afficher_relocation_type(int type){
 void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
 	Elf32_Shdr section;
 
-	for (int i = 0; i < header.e_shnum; i++){
+	for (int i = 0; i < header.e_shnum; i++) {
 		fseek(elfFile, header.e_shoff + i * header.e_shentsize, SEEK_SET);
 		fread(&section, 1, sizeof(section), elfFile);
 
