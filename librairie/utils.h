@@ -1,6 +1,9 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 #include <elf.h>
+#include "../librairie/macro_header.h"
+#include "../librairie/macro_symbole.h"
+#include "../librairie/macro_section.h"
 
 /* Récupére le nom des sections de la table des sections
  * et le renvoit

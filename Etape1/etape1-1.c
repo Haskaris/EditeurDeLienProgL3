@@ -159,7 +159,7 @@ void machine(Elf32_Ehdr header) {
 void affichage_Entete_Fichier_ELF(Elf32_Ehdr header) {
 	printf("En-tête ELF:\n	Magique:\t");
 	for (int i = 0; i < 16; i++) {
-		printf("%02x ",header.e_ident[i]);
+		printf("%02x ", header.e_ident[i]);
 	}
 
 	printf("\n	Classe:\t\t\t\t");

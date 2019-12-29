@@ -93,7 +93,6 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 	}
 }
 
-
 void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header) {
 	uint32_t i;
 	Elf32_Shdr section;

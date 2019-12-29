@@ -8,7 +8,6 @@ int main(int argc, char *argv[]) {
 
 	FILE * elfFile;
 	Elf32_Ehdr header;
-	int bigEndian = 0;
 	int choix = -1;
 	int numSection = -1;
 	if (argc != 4) {
@@ -18,39 +17,37 @@ int main(int argc, char *argv[]) {
 		elfFile = fopen(argv[1], "r");
 		choix = (int)(*argv[2]) - '0';;
 		numSection = (int)(*argv[3]) - '0';
-    		if (elfFile == NULL) {
-      			printf("Erreur lors de l'ouverture du fichier.\n");
-    		}
-    		else {
-      			// Lit l'entête
-      			fread(&header, sizeof(header), 1, elfFile);
-      			if (isbigendian(header)){
+		if (elfFile == NULL) {
+			printf("Erreur lors de l'ouverture du fichier.\n");
+		} else {
+			// Lit l'entête
+			fread(&header, sizeof(header), 1, elfFile);
+			if (isbigendian(header)) {
 				inversion_Header(&header);
-
-      			}
-
-      			// Est-ce que c'est bien un fichier elf ?
-      			if (memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
-				//int numSection = 0;
+			}
+			// Est-ce que c'est bien un fichier elf ?
+			if (memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
 				switch(choix){
-					case 1: affichage_Entete_Fichier_ELF(header);
+					case 1:
+						affichage_Entete_Fichier_ELF(header);
 						break;
-					case 2: affichage_Table_Sections(elfFile, header);
+					case 2:
+						affichage_Table_Sections(elfFile, header);
 						break;
-					case 3:	//printf("Saisir le nombre de la section voulue ");
-						//scanf("%d", &numSection);
+					case 3:
 						affichage_Contenu_Section(elfFile, header, numSection);
 						break;
-					case 4: affichage_Table_Des_Symbole(elfFile, header);
+					case 4:
+						affichage_Table_Des_Symbole(elfFile, header);
 						break;
-					case 5: affichage_Table_Reimplantation(elfFile, header);
+					case 5:
+						affichage_Table_Reimplantation(elfFile, header);
 						break;
 					default:
 						printf("Numero invalide ");
-						break;
 				}
 			} else {
-				printf("Le fichier passe en argument n'est pas un fichier ELF\n");
+				printf("Le fichier passé en argument n'est pas un fichier ELF\n");
 			}
 			fclose(elfFile);
 		}

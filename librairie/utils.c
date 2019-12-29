@@ -1,6 +1,8 @@
 #include "lib-bigEndian.h"
 #include "utils.h"
 
+#define DECALAGE(header, i) header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(Elf32_Shdr)
+
 /*
 * Il faut penser à FREE !
 */

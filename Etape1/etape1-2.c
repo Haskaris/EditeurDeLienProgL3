@@ -2,10 +2,7 @@
 #include "etape1-2.h"
 
 void headtext(){
-	printf("Il y a 11 en-têtes de section, débutant à l'adresse de décalage 0x7b8"
-		":\n\nEn-têtes de section :\n[Nr] Nom							 Type						 Adress"
-		"e					 Décalage\n			 Taille						TaillEntrée	 Fanion	Lien "
-		" Info	Alignement\n");
+	printf("En-têtes de section :\n[Nr] Nom\t\tType\t\tAdr\t Décala.Taille ES Fan Ln Inf Al\n");
 }
 
 void foottext(){
@@ -18,7 +15,7 @@ void foottext(){
 
 void align(char* str, int indent) {
 	int length = strlen(str);
-	if(length >= indent) return;
+	if(length > indent) return;
 	for(int i = length; i < indent; i++) {
 		printf(" ");
 	}
@@ -51,72 +48,72 @@ void flagsToString(uint32_t flag) {
 		printf("I");
 	} else i++;
 	if((flag&128) != 0) {
-		//Ajouter I
+		//Ajouter L
 		printf("L");
 	} else i++;
 	if((flag&256) != 0) {
-		//Ajouter I
+		//Ajouter O
 		printf("O");
 	} else i++;
 	for (int count = 0; count < i; count++) printf(" ");
-	printf("\t");
+	printf(" ");
 }
 
 void typeToString(uint32_t type) {
 	switch (type) {
 		case SHT_NULL:
-			printf("NULL						 ");
+			printf("NULL\t\t");
 			break;
 		case SHT_PROGBITS:
-			printf("PROGBITS				 ");
+			printf("PROGBITS\t");
 			break;
 		case SHT_SYMTAB:
-			printf("SYMTAB					 ");
+			printf("SYMTAB\t\t");
 			break;
 		case SHT_STRTAB:
-			printf("STRTAB					 ");
+			printf("STRTAB\t\t");
 			break;
 		case SHT_RELA:
-			printf("RELA						 ");
+			printf("RELA\t\t");
 			break;
 		case SHT_HASH:
-			printf("HASH						 ");
+			printf("HASH\t\t");
 			break;
 		case SHT_DYNAMIC:
-			printf("DYNAMIC					");
+			printf("DYNAMIC\t\t");
 			break;
 		case SHT_NOTE:
-			printf("NOTE						 ");
+			printf("NOTE\t\t");
 			break;
 		case SHT_NOBITS:
-			printf("NOBITS					 ");
+			printf("NOBITS\t\t");
 			break;
 		case SHT_REL:
-			printf("REL							");
+			printf("REL\t\t");
 			break;
 		case SHT_SHLIB:
-			printf("SHLIB						");
+			printf("SHLIB\t\t");
 			break;
 		case SHT_DYNSYM:
-			printf("DYNSYM					 ");
+			printf("DYNSYM\t\t");
 			break;
 		case SHT_LOPROC:
-			printf("LOPROC					 ");
+			printf("LOPROC\t\t");
 			break;
 		case SHT_HIPROC:
-			printf("HIPROC					 ");
+			printf("HIPROC\t\t");
 			break;
 		case SHT_LOUSER:
-			printf("LOUSER					 ");
+			printf("LOUSER\t\t");
 			break;
 		case SHT_HIUSER:
-			printf("HIUSER					 ");
+			printf("HIUSER\t\t");
 			break;
 		case 1879048195:
-			printf("ARM_ATTRIBUTES	 ");
+			printf("ARM_ATTRIBUTES\t");
 			break;
 		default :
-			printf("Err : %d		 ", type);
+			printf("Err : %d\t", type);
 	}
 }
 
@@ -124,14 +121,15 @@ void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header) {
 	Elf32_Shdr section;
 
 	// read all section headers
-	printf("Il	y a %d sections dans le fichier.", header.e_shnum);
+	printf("Il y a %d sections dans le fichier\n.", header.e_shnum);
 	headtext();
 	for (int i = 0; i < header.NOMBRE_ENTREE_TABLE_SECTIONS; i++) {
 		const char* name = "";
 
-		fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(section), SEEK_SET);
+		fseek(elfFile, DECALAGE(header, i), SEEK_SET);
 		fread(&section, 1, sizeof(section), elfFile);
-		//Si le fichier ELF n'est pas en litle Endian on l'inverse
+
+		//Si le fichier ELF n'est pas en litle Endian on inverse la section
 		if (isbigendian(header)){
 			inversion_Sections(&section);
 		}
@@ -142,16 +140,16 @@ void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header) {
 		char* nom_section = NULL;
 		nom_section = get_section_name(elfFile, header, section);
 		printf("%s ",nom_section);
-		align(nom_section, 16);
+		align(nom_section, 18);
 
 		typeToString(section.CONTENU_SEMANTIQUE);
-		printf("%016x ", section.ADRESSE_MEMOIRE);
-		printf("%08x\n		 ", section.DECALAGE_DEBUT_FICHIER);
-		printf("%016x ", section.TAILLE_SECTION);
-		printf("%016x ", section.TAILLE_TABLE_ENTREE_FIXE);
+		printf("%08x ", section.ADRESSE_MEMOIRE);
+		printf("%06x ", section.DECALAGE_DEBUT_FICHIER);
+		printf("%06x ", section.TAILLE_SECTION);
+		printf("%02x ", section.TAILLE_TABLE_ENTREE_FIXE);
 		flagsToString(section.DRAPEAUX_ATTRIBUTS);
-		printf("%u\t", section.LIEN_INDICE_TABLE_SECTION);
-		printf("%u\t", section.INFORMATIONS_COMPLEMENTAIRES);
+		printf("%u ", section.LIEN_INDICE_TABLE_SECTION);
+		printf("%u ", section.INFORMATIONS_COMPLEMENTAIRES);
 		printf("%u\n", section.CONTRAINTE_D_ALIGNEMENT);
 	}
 	foottext();
