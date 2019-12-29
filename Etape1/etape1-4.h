@@ -1,5 +1,6 @@
 #ifndef __ETAPE1_4_H__
 #define __ETAPE1_4_H__
+//TODO: nettoyer les includes
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,14 +10,6 @@
 #include "../librairie/macro_symbole.h"
 #include "../librairie/macro_header.h"
 #include "../librairie/lib-bigEndian.h"
-
-/* Lit le nom des sections de la table des entêtes
- * et le renvoit
- * arguments :
- *	- le fichier ELF (elfFile) ouvert
- *	- la table des entêtes du fichier ELF (section)
-*/
-//char* get_section_names(FILE *elfFile, Elf32_Shdr section);
 
 /* Créer la table des symboles, la lit dans le fichier ELF
  * puis écrit son contenu dans la console
