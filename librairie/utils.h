@@ -5,6 +5,32 @@
 #include "../librairie/macro_symbole.h"
 #include "../librairie/macro_section.h"
 
+/* Lit la section passé en paramètre et l'inverse en
+ * fonction de big endian ou non
+ * Arguments :
+ *	- le fichier ELF (elfFile) ouvert
+ *	- entête du fichier ELF (header)
+ *	- la table des sections du fichier ELF (section)
+*/
+void litEtInverse_Section(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr* section);
+
+/* Lit la section passé en paramètre et l'inverse en
+ * fonction de big endian ou non
+ * Arguments :
+ *	- le fichier ELF (elfFile) ouvert
+ *	- entête du fichier ELF (header)
+ *	- la table des sections du fichier ELF (section)
+*/
+void litEtInverse_TalbeSymbole(FILE* elfFile, Elf32_Ehdr header, Elf32_Sym* table_symbole);
+
+/* Lit la section passé en paramètre et l'inverse en
+ * fonction de big endian ou non
+ * Arguments :
+ *	- le fichier ELF (elfFile) ouvert
+ *	- entête du fichier ELF (header)
+*/
+void litEtInverse_Header(FILE* elfFile, Elf32_Ehdr* header);
+
 /* Récupére le nom des sections de la table des sections
  * et le renvoit
  * arguments :

@@ -21,10 +21,8 @@ int main(int argc, char *argv[]) {
 			printf("Erreur lors de l'ouverture du fichier.\n");
 		} else {
 			// Lit l'entête
-			fread(&header, sizeof(header), 1, elfFile);
-			if (isbigendian(header)) {
-				inversion_Header(&header);
-			}
+			litEtInverse_Header(elfFile, &header);
+			
 			// Est-ce que c'est bien un fichier elf ?
 			if (memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
 				switch(choix){

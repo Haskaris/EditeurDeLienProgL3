@@ -12,11 +12,7 @@ void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int numSection)
 	if (i <= header.NOMBRE_ENTREE_TABLE_SECTIONS) {
 		//Lit la section
 		fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(section), SEEK_SET);
-		fread(&section, 1, sizeof(section), elfFile);
-		//Inversion de la table si elle n'est pas en litle Endian
-		if (isbigendian(header)){
-			inversion_Sections(&section);
-		}
+		litEtInverse_Section(elfFile, header, &section);
 
 		//Récupère le nom de la section
 		char* tableName = NULL;

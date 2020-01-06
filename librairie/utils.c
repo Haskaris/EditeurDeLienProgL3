@@ -3,6 +3,30 @@
 
 #define DECALAGE(header, i) header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(Elf32_Shdr)
 
+void litEtInverse_Section(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr* section) {
+	fread(section, 1, sizeof(Elf32_Shdr), elfFile);
+
+	if (isbigendian(header)) {
+		inversion_Sections(section);
+	}
+}
+
+void litEtInverse_TalbeSymbole(FILE* elfFile, Elf32_Ehdr header, Elf32_Sym* table_symbole) {
+	fread(table_symbole, 1, sizeof(Elf32_Sym), elfFile);
+
+	if (isbigendian(header)) {
+		insersion_Table_Symbole(table_symbole);
+	}
+}
+
+void litEtInverse_Header(FILE* elfFile, Elf32_Ehdr* header) {
+	fread(header, sizeof(Elf32_Ehdr), 1, elfFile);
+
+	if (isbigendian(*header)) {
+		inversion_Header(header);
+	}
+}
+
 /*
 * Il faut penser à FREE !
 */
@@ -10,12 +34,13 @@ char* get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section) {
 	Elf32_Shdr table_chaine;
 	char* name = malloc(255);
 	fseek(elfFile, header.e_shoff + header.e_shstrndx * header.e_shentsize, SEEK_SET);
-	fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
+	litEtInverse_Section(elfFile, header, &table_chaine);
+	/*fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
 
 	//Si le fichier ELF n'est pas en litle Endian on l'inverse
-	if (isbigendian(header)) {//
-		inversion_Sections(&table_chaine);//
-	}//
+	if (isbigendian(header)) {
+		inversion_Sections(&table_chaine);
+	}*/
 
 	fseek(elfFile, table_chaine.sh_offset + section.sh_name, SEEK_SET);
 	char c = fgetc(elfFile);
