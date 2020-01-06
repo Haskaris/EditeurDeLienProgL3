@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 		elfFile1 = fopen(argv[1], "r");
 		elfFile2 = fopen(argv[2], "r");
 		outputFile = fopen(argv[3], "w");
-		choix = (int)(*argv[4]) - '0';
+		choix = 3;//(int)(*argv[4]) - '0';
 		if (elfFile1 == NULL || elfFile2 == NULL) {
 			printf("Erreur lors de l'ouverture du fichier.\n");
 		} else {
@@ -37,9 +37,9 @@ int main(int argc, char *argv[]) {
 				default:
 					printf("Numero invalide ");
 			}
-			fclose(elfFile1);
-			fclose(elfFile2);
-			fclose(outputFile);
 		}
+		fclose(elfFile1);
+		fclose(elfFile2);
+		fclose(outputFile);
 	}
 }
