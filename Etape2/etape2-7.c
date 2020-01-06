@@ -4,6 +4,7 @@
 #include <elf.h>
 #include "etape2-7.h"
 
+void fusion_symbole() {}
 
 void fusionSymbole32(int bigEndian){
 
@@ -22,24 +23,24 @@ Elf32_Sym copie_Sym_Tab(Elf32_Sym element){
 }
 
 
-Elf32_Sym* print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uint32_t indice, int bigEndian){	
+Elf32_Sym* print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_table, uint32_t indice, int bigEndian){
 	Elf32_Sym sym_tbl;
 	uint32_t i, nombre_symbol;
 	//accéde à la table des symboles
 	fseek(elfFile, eh.e_shoff + indice * sizeof(sh_table), SEEK_SET);
 	fread(&sh_table, 1, sizeof(sh_table), elfFile);
   	//printf("Name : %s\n",get_section_names(elfFile, sh_table, bigEndian) + sh_table.sh_name);
-	
-	// calcul du nombre de symbole   	
+
+	// calcul du nombre de symbole
 	nombre_symbol = byteshift32(sh_table.sh_size, bigEndian) / byteshift32(sh_table.sh_entsize, bigEndian);
   	fseek(elfFile, byteshift32(sh_table.sh_offset, bigEndian), SEEK_SET);
 
 	printf("La table de symboles << .symtab >> contient %d entrées :\n", nombre_symbol);
 	printf("  Num:   Valeur     Tail  Type  Lien  Vis     Ndx Nom\n");
-	
+
 	//resultat à retourner
 	Elf32_Sym *res = malloc(sizeof(Elf32_Sym) * nombre_symbol);
-        
+
 	//on affiche les informations du symbole
 	for(i=0; i< nombre_symbol; i++) {
 		fread(&sym_tbl, 1, sizeof(sym_tbl), elfFile);
@@ -93,7 +94,7 @@ Elf32_Sym* print_symbol_table32(FILE* elfFile, Elf32_Ehdr eh, Elf32_Shdr sh_tabl
 				break;
 		}
     		printf(" %x  ", byteshift16(sym_tbl.st_shndx, bigEndian));
-    		printf(" %02x\n", byteshift32(sym_tbl.st_name, bigEndian));	
+    		printf(" %02x\n", byteshift32(sym_tbl.st_name, bigEndian));
 	}
 	return res;
 }
@@ -102,8 +103,8 @@ Elf32_Sym* stockage_table_symbol_init32(FILE* elfFile, Elf32_Ehdr eh, int bigEnd
 	uint32_t i;
 	Elf32_Shdr section;
 
-	//parcours la table des entêtes et 
-	//cherche la section contenant la table des symboles (SHT_SYMTAB)		
+	//parcours la table des entêtes et
+	//cherche la section contenant la table des symboles (SHT_SYMTAB)
 	for(i=0; i<byteshift16(eh.e_shnum, bigEndian); i++) {
 		fseek(elfFile, byteshift32(eh.e_shoff, bigEndian) + i * sizeof(section), SEEK_SET);
          	fread(&section, 1, sizeof(section), elfFile);
@@ -120,7 +121,7 @@ int main(int argc, char *argv[]){
   	Elf32_Ehdr header;
 	Elf32_Ehdr header2;
 	Elf32_Sym tableFinal = malloc(sizeof(Elf32_Sym));
-	
+
 	//Format des fichier 1 et 2
 	int bigEndian = 0;
 	int bigEndian2 = 0;
@@ -146,13 +147,13 @@ int main(int argc, char *argv[]){
 				fread(&header2, 1, sizeof(header2), elfFile2);
 
 				if (isbigendian(header)){
-					bigEndian = 1; 
+					bigEndian = 1;
 				}
 				if (isbigendian(header2){
 					bigEndian2 = 1;
 				}
-				
-				
+
+
 
 				Elf32_Sym *Sym_tab = stockage_table_symbol_init32(elfFile, header, bigEndian);
 				ELf32_Sym *Sym_tab2 = stockage_table_symbol_init32(elfFile2, header2, bigEndian2);

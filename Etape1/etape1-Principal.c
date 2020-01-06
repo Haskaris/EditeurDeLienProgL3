@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	} else {
 		elfFile = fopen(argv[1], "r");
-		choix = (int)(*argv[2]) - '0';;
+		choix = (int)(*argv[2]) - '0';
 		numSection = (int)(*argv[3]) - '0';
 		if (elfFile == NULL) {
 			printf("Erreur lors de l'ouverture du fichier.\n");

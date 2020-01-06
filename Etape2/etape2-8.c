@@ -2,15 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-#include "../librairie/utils.h"
-#include "../librairie/lib-bigEndian.h"
-#include "../librairie/macro_section.h"
-#include "../librairie/macro_symbole.h"
-#include "../librairie/macro_header.h"
-#include "../librairie/macro_repositionnement.h"
+#include "etape2-8.h"
 
 
-int fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* output){
+void fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* output){
 	FILE * tempFile;
 	uint32_t section_name=0;
 
