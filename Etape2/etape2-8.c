@@ -5,7 +5,7 @@
 #include "etape2-8.h"
 
 
-void fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* output){
+void fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* outputFile){
 	FILE * tempFile;
 	uint32_t section_name=0;
 
