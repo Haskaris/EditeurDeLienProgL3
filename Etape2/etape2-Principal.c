@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
 	FILE * elfFile2;
 	FILE * outputFile;
 	int choix = -1;
-	if (argc != 4) {
+	if (argc != 5) {
 		printf("Utilisation : %s <ELF_FILE1> <ELF_FILE2> <OUTPUT_FILE> <choixNumero>\n", argv[0]);
 		exit(1);
 	} else {
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 					fusion_symbole(elfFile1, elfFile2, outputFile);
 					break;
 				case 3:
-					fusion_reimplementaton(elfFile1, elfFile2, outputFile);
+					fusion_reimplementation(elfFile1, elfFile2, outputFile);
 					break;
 				case 4:
 					printf("Etape 9 non implémenté");
