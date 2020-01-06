@@ -8,12 +8,8 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 
 	//accéde à la table des symboles
 	fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + indice * sizeof(section), SEEK_SET);
-	fread(&section, 1, sizeof(section), elfFile);
 
-	//Inversion de la table si elle n'est pas en litle Endian
-	if (isbigendian(header)) {
-		inversion_Sections(&section);
-	}
+	litEtInverse_Section(elfFile, header, &section);
 
 	// calcul du nombre de symbole
 	nombre_symbol = section.TAILLE_SECTION / section.TAILLE_TABLE_ENTREE_FIXE;
@@ -25,10 +21,8 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 
 	//on affiche les informations du symbole
 	for(i=0; i< nombre_symbol; i++) {
-		fread(&table_symbole, 1, sizeof(table_symbole), elfFile);
-		if (isbigendian(header)){
-			insersion_Table_Symbole(&table_symbole);
-		}
+		litEtInverse_TalbeSymbole(elfFile, header, &table_symbole);
+
 		printf("	 %d:",i);
 		printf("	%08x ", table_symbole.VALEUR_SYMBOLE);
 		printf(" %u ", table_symbole.TAILLE_SYMBOLE);
@@ -48,7 +42,7 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 			case 4:
 				printf("	FILE	");
 				break;
- 			default:
+			default:
 				printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_tabl"
 								"e32 switch ELF32_ST_TYPE ");
 		}
@@ -100,10 +94,8 @@ void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header) {
 	//cherche la section contenant la table des symboles (SHT_SYMTAB)
 	for(i=0; i < header.NOMBRE_ENTREE_TABLE_SECTIONS; i++) {
 		fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(section), SEEK_SET);
-		fread(&section, 1, sizeof(section), elfFile);
-		if (isbigendian(header)) {
-			inversion_Sections(&section);
-		}
+		litEtInverse_Section(elfFile, header, &section);
+		
 		if (section.CONTENU_SEMANTIQUE == SHT_SYMTAB) {
 			print_symbol_table32(elfFile, header, section, i);
 			break;

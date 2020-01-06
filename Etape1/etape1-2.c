@@ -127,12 +127,7 @@ void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header) {
 		const char* name = "";
 
 		fseek(elfFile, DECALAGE(header, i), SEEK_SET);
-		fread(&section, 1, sizeof(section), elfFile);
-
-		//Si le fichier ELF n'est pas en litle Endian on inverse la section
-		if (isbigendian(header)){
-			inversion_Sections(&section);
-		}
+		litEtInverse_Section(elfFile, header, &section);
 
 		// print section name
 		printf("[%2u] ", i);

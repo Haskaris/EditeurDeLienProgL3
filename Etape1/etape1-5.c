@@ -47,11 +47,7 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
 
 	for (int i = 0; i < header.e_shnum; i++) {
 		fseek(elfFile, header.e_shoff + i * header.e_shentsize, SEEK_SET);
-		fread(&section, 1, sizeof(section), elfFile);
-
-		if (isbigendian(header)) {
-			inversion_Sections(&section);
-		}
+		litEtInverse_Section(elfFile, header, &section);
 
 		char* nom_section = NULL;
 
