@@ -65,6 +65,9 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
 			fseek(elfFile, section.sh_offset, SEEK_SET);
 			for (int i=0;i<nb_entree;i++){
 				fread(&rela,1,sizeof(rela),elfFile);
+				if (isbigendian(header)) {
+					inversion_Relation_Additif(&rela);
+				}
 				printf("décalage : %012x  ", rela.r_offset);
 				printf("type : ");
 				afficher_relocation_type(ELF32_R_TYPE(rela.r_info));
@@ -83,6 +86,9 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
 			fseek(elfFile, section.sh_offset, SEEK_SET);
 			for (int i=0;i<nb_entree;i++){
 				fread(&rel,1,sizeof(rel),elfFile);
+				if (isbigendian(header)) {
+					inversion_Relation_Sans_Additif(&rel);
+				}
 				printf("décalage : %012x  ",rel.r_offset);
 				printf("type : ");
 				afficher_relocation_type(ELF32_R_TYPE(rel.r_info));
