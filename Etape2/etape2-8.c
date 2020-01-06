@@ -23,11 +23,17 @@ void fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* output){
 		else {
 			fread(&header1, sizeof(header1),1, elfFile1);
 			fread(&header2, sizeof(header2),1, elfFile2);
+			if (isbigendian(header1)) {
+				inversion_Header(&header1);
+			}
+			if (isbigendian(header2)) {
+				inversion_Header(&header2);
+			}
 			// check so its really an elf file
 			if (memcmp(header1.e_ident, ELFMAG, SELFMAG) == 0 && memcmp(header2.e_ident, ELFMAG, SELFMAG) == 0 ) {
 				fwrite(&header1,sizeof(header1),1,outputFile);
-				for (int i=0; i<header1.e_shnum);i++){ //parcours des sections du fichier 1
-					fseek(elfFile1, header1.e_shoff) + i * header1.e_shentsize, SEEK_SET);
+				for (int i=0; i<header1.e_shnum;i++){ //parcours des sections du fichier 1
+					fseek(elfFile1, header1.e_shoff + i * header1.e_shentsize, SEEK_SET);
 					fread(&section1, 1, sizeof(section2), elfFile1);
 					get_section_name(elfFile1,header1,section1,nom_section1);
 					for (int j=0;j<header2.e_shnum;j++){ //parcours des sections du fichier 2
