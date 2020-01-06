@@ -4,8 +4,10 @@
 #include <elf.h>
 #include "etape2-7.h"
 
-void fusion_symbole() {}
-
+void fusion_symbole(FILE * elfFile1, FILE * elfFile2, FILE * outputFile) {
+	return;
+}
+/*
 void fusionSymbole32(int bigEndian){
 
 	return;
@@ -114,7 +116,7 @@ Elf32_Sym* stockage_table_symbol_init32(FILE* elfFile, Elf32_Ehdr eh, int bigEnd
 	}
 }
 
-int main(int argc, char *argv[]){
+int main_(int argc, char *argv[]){
 	FILE * elfFile;
 	FILE * elfFile2;
 
@@ -156,7 +158,7 @@ int main(int argc, char *argv[]){
 
 
 				Elf32_Sym *Sym_tab = stockage_table_symbol_init32(elfFile, header, bigEndian);
-				ELf32_Sym *Sym_tab2 = stockage_table_symbol_init32(elfFile2, header2, bigEndian2);
+				Elf32_Sym *Sym_tab2 = stockage_table_symbol_init32(elfFile2, header2, bigEndian2);
 
 				//On ferme les 2 fichier ELF
 				fclose(elfFile);
@@ -166,3 +168,4 @@ int main(int argc, char *argv[]){
   	}
 	return 0;
 }
+*/

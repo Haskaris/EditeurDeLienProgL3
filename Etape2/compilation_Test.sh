@@ -6,9 +6,6 @@ make clean
 
 make
 
-#Choix du numéro de section si on prend l'étape 3
-numSection=0
-
 #Ensemble des fichiers tests .o
 elfExampleFile=$(ls ../Examples_loader | grep .o$)
 
@@ -19,17 +16,10 @@ echo "Quel est votre choix ? "
 read choix
 echo "choix : $choix"
 
-if [ $choix -eq 3 ]
-then
-	#Si on veut afficher le contenu d'une section dans ce cas il faut le numéro de section
-	echo ""
-	echo "Il faut choisir le numéro d'une section : "
-	read numSection
-fi
 
-
-for i in $elfExampleFile
+for ((i=6; i<=7; i++))
 do
+	j = ((i+1))
 	echo -e "\n\n\nFichier du dossier Examples_loader : $i"
-	./elfParsing "../Examples_loader/$i" $choix $numSection
+	./elfParsing "../Examples_loader/$i" "../Examples_loader/$j" "../Examples_loader/Fusion/fusion_$i" $choix
 done
