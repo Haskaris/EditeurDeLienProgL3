@@ -19,10 +19,15 @@ void ajouter_nom(char* nom, char* table_nom,int fin_tab){
 	}
 }
 
+void file_copy(FILE* file1, FILE* file2, size_t size){
+	void* ptr=malloc(size);
+	fread(ptr,size,1,file1);
+	fwrite(ptr,size,1,file2);
+}
+
 void fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* outputFile){
 	FILE * tempFile;
 	uint32_t section_name=0;
-
 	Elf32_Ehdr header1,header2,headerOutput;
 	Elf32_Shdr section1,section2,sectionOut;
 
@@ -53,6 +58,7 @@ void fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* outputFile){
 							sectionOut.sh_offset=ftell(tempFile);
 							sectionOut.sh_size=section1.sh_size+section2.sh_size;
 							fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
+
 
 						}
 					}
