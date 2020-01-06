@@ -28,6 +28,24 @@ void litEtInverse_TalbeSymbole(FILE* elfFile, Elf32_Ehdr header, Elf32_Sym* tabl
  * Arguments :
  *	- le fichier ELF (elfFile) ouvert
  *	- entête du fichier ELF (header)
+ *	- (rel)
+*/
+void litEtInverse_Rel(FILE* elfFile, Elf32_Ehdr header, Elf32_Rel* rel);
+
+/* Lit la section passé en paramètre et l'inverse en
+ * fonction de big endian ou non
+ * Arguments :
+ *	- le fichier ELF (elfFile) ouvert
+ *	- entête du fichier ELF (header)
+ *	- (rela)
+*/
+void litEtInverse_Rela(FILE* elfFile, Elf32_Ehdr header, Elf32_Rela* rela);
+
+/* Lit la section passé en paramètre et l'inverse en
+ * fonction de big endian ou non
+ * Arguments :
+ *	- le fichier ELF (elfFile) ouvert
+ *	- entête du fichier ELF (header)
 */
 void litEtInverse_Header(FILE* elfFile, Elf32_Ehdr* header);
 
