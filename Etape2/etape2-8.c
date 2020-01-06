@@ -2,46 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
+#include "etape2-8.h"
 
-int isbigendian(){
-    return 1;
-}
-
-uint16_t byteshift16(uint16_t n){
-    if (isbigendian()){
-        return ((n>>8)&0xff) | ((n<<8)&0xff00);
-    }
-    else{
-        return n;
-    }
-}
-
-uint32_t byteshift32(uint32_t n) {
-    if (isbigendian()){
-          return ((n>>24)&0xff) | ((n<<8)&0xff0000) | ((n>>8)&0xff00) | ((n<<24)&0xff000000);
-    }
-    else{
-        return n;
-    }
-}
-
-
-void get_section_name(FILE* elfFile,Elf32_Ehdr header,Elf32_Shdr section, char* name){
-    Elf32_Shdr table_chaine;
-    fseek(elfFile,byteshift32(header.e_shoff)+byteshift16(header.e_shstrndx)*byteshift16(header.e_shentsize),SEEK_SET);
-    fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
-    fseek(elfFile,byteshift32(table_chaine.sh_offset)+byteshift32(section.sh_name),SEEK_SET);
-    char c=fgetc(elfFile);
-    int i=0;
-    while(c!='\0'){
-        name[i]=c;
-        i++;
-        c=fgetc(elfFile);
-    }
-    name[i]='\0';
-
-}
-
+void fusion_reimplementaton() {}
 
 int main(int argc, char* argv[]){
     FILE * elfFile1;
@@ -88,7 +51,7 @@ int main(int argc, char* argv[]){
                           sectionOut.sh_addr=section1.sh_addr;
                           sectionOut.sh_offset=ftell(outputFile);
                           sectionOut.sh_size=section1.sh_size+section2.sh_size;
-                          
+
                       }
                   }
               }

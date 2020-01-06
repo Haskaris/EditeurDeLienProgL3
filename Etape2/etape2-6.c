@@ -4,6 +4,8 @@
 #include <elf.h>
 #include "etape2-6.h"
 
+void fusion_section() {}
+
 int main(int argc, char *argv[]) {
   FILE * fileToJoin1;
   FILE * fileToJoin2;

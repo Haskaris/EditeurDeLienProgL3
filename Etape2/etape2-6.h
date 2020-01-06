@@ -3,3 +3,5 @@
 #include <string.h>
 #include <elf.h>
 #include "../librairie/lib-bigEndian.c"
+
+void fusion_section();
