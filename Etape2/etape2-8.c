@@ -4,7 +4,18 @@
 #include <elf.h>
 #include "etape2-8.h"
 
-
+void ajouter_nom(char* nom, char* table_nom){
+	int i=0,j=0;
+	while (table_nom[i]!=0 || table_nom[i+1]!=0){ //On parcourt la table jusqu'à avoir deux octets nuls à la suite
+		i++;
+	}
+	i++;
+	while (nom[j]!=0){
+			table_nom[i]=nom[j];
+			i++;
+			j++;
+	}
+}
 void fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* outputFile){
 	FILE * tempFile;
 	uint32_t section_name=0;
@@ -12,6 +23,7 @@ void fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* outputFile){
 	Elf32_Ehdr header1,header2,headerOutput;
 	Elf32_Shdr section1,section2,sectionOut;
 
+	char tabNomSection[1000]="";
 	char nom_section1[255],nom_section2[255];
 		elfFile1 = fopen(argv[1], "r");
 		elfFile2 = fopen(argv[2], "r");
@@ -46,7 +58,7 @@ void fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* outputFile){
 							sectionOut.sh_type=section1.sh_type;
 							sectionOut.sh_flags=section1.sh_flags;
 							sectionOut.sh_addr=section1.sh_addr;
-							sectionOut.sh_offset=ftell(outputFile);
+							sectionOut.sh_offset=ftell(tempFile);
 							sectionOut.sh_size=section1.sh_size+section2.sh_size;
 						}
 					}
