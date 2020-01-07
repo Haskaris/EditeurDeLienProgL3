@@ -346,7 +346,7 @@ void fusion_reimplementation(FILE* elfFile1, FILE* elfFile2,FILE* outputFile){
 		fwrite(tabNomSection,sz,1,tempFile);
 		//Concaténation de tempFile à outputFile
 		fseek(outputFile,offset_sections,SEEK_SET);
-		char ch;
+		char ch;////
 		fseek(tempFile,0,SEEK_SET);
 		while((ch = fgetc(tempFile)) != EOF)
         fputc(ch,outputFile);
