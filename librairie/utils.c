@@ -2,6 +2,8 @@
 #include "utils.h"
 
 #define DECALAGE(header, i) header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(Elf32_Shdr)
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#define max(a, b) (((a) > (b)) ? (a) : (b))
 
 void litEtInverse_Section(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr* section) {
 	fread(section, 1, sizeof(Elf32_Shdr), elfFile);
