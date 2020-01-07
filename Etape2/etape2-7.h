@@ -1,3 +1,5 @@
+#ifndef __ETAPE2_7_H__
+#define __ETAPE2_7_H__
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -67,3 +69,10 @@ void stockage_table_symbol_init32(FILE *elfFile, Elf32_Ehdr header, FILE* elfFil
  *	- deuxième fichier ELF source (elfFileSource1)
 */
 void write_Symbol_Table(Elf32_Ehdr header1, Elf32_Ehdr header2, FILE *elfFileDest, FILE *elfFileSource, FILE *elfFileSource1);
+
+/* fonction principal
+*/
+void fusion_symbole(FILE * elfFile1, FILE * elfFile2, FILE * outputFile);
+
+
+#endif  /* __ETAPE2_7_H__ */

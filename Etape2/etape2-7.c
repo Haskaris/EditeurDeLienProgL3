@@ -3,6 +3,9 @@
 #include <string.h>
 #include <elf.h>
 #include "etape2-7.h"
+void fusion_symbole(FILE * elfFile1, FILE * elfFile2, FILE * outputFile) {
+	return;
+}
 
 /* Arbre contenant toutes les variables 
  * globals de la table des symboles
@@ -153,3 +156,4 @@ void write_Symbol_Table(Elf32_Ehdr header1, Elf32_Ehdr header2, FILE *elfFileDes
 	ecritureSymboleGlobaux(elfFileDest, ArbreVariableGlobal);
 	return;
 }
+
