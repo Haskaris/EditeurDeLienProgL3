@@ -8,7 +8,7 @@
  * retourne l'élément trouvé
  * ou NULL si l'élément n'existe pas
 */
-struct Noeud* dansArbreDeRecherche(struct Noeud *noeud, Elf32_Sym symbole){
+Noeud* dansArbreDeRecherche(Noeud *noeud, Elf32_Sym symbole){
 	if (noeud == NULL){
 		return NULL;
 	} else if (noeud->symboleCourant.NOM_SYMBOLE == symbole.NOM_SYMBOLE){
@@ -24,26 +24,26 @@ struct Noeud* dansArbreDeRecherche(struct Noeud *noeud, Elf32_Sym symbole){
 /* Insère un élément dans 
  * l'arbre de recherche
 */
-void insereNoeudDansArbre(struct Noeud *Arbre, Elf32_Sym symbole){
+void insereNoeudDansArbre(Noeud *Arbre, Elf32_Sym symbole){
 	if (Arbre->symboleCourant.NOM_SYMBOLE == symbole.NOM_SYMBOLE){
 		printf("Problème noeud déjà dans arbre (arbreBinaire.c)\n");
 		exit(0);
 	} else if (Arbre->symboleCourant.NOM_SYMBOLE < symbole.NOM_SYMBOLE){
 		if (Arbre->noeudGauche == NULL){
-			struct Noeud *nouveauNoeud = malloc(sizeof(struct Noeud));
-			nouveauNoeud->symboleCourant.NOM_SYMBOLE = symbole;
+			Noeud *nouveauNoeud = malloc(sizeof(struct Noeud));
+			nouveauNoeud->symboleCourant.NOM_SYMBOLE = symbole.NOM_SYMBOLE;
 			Arbre->noeudGauche = nouveauNoeud;
 		} else {
-			return dansArbreDeRecherche(Arbre->noeudGauche, symbole);
+			return insereNoeudDansArbre(Arbre->noeudGauche, symbole);
 		}
 	} else {
 		//noeud->name > name
 		if (Arbre->noeudDroit == NULL){
-			struct Noeud *nouveauNoeud = malloc(sizeof(struct Noeud));
-			nouveauNoeud->symboleCourant.NOM_SYMBOLE = symbole;
+			Noeud *nouveauNoeud = malloc(sizeof(struct Noeud));
+			nouveauNoeud->symboleCourant.NOM_SYMBOLE = symbole.NOM_SYMBOLE;
 			Arbre->noeudDroit = nouveauNoeud;
 		} else {
-			return dansArbreDeRecherche(Arbre->noeudDroit, symbole);
+			return insereNoeudDansArbre(Arbre->noeudDroit, symbole);
 		}
 	}
 }
