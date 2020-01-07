@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-#include "../librairie/lib-bigEndian.c"
+//#include "../librairie/lib-bigEndian.c"
 #include "../librairie/macro_section.h"
 #include "../librairie/macro_symbole.h"
 #include "../librairie/macro_header.h"

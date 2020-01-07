@@ -7,6 +7,20 @@ void fusion_symbole(FILE * elfFile1, FILE * elfFile2, FILE * outputFile) {
 	return;
 }
 
+void sectionTableSymbole(FILE *elfFile, Elf32_Ehdr header, Elf32_Shdr *section){
+	uint32_t i;
+	//parcours la table des entêtes et
+	//cherche la section contenant la table des symboles (SHT_SYMTAB)
+	for(i=0; i < header.NOMBRE_ENTREE_TABLE_SECTIONS; i++) {
+		fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(*section), SEEK_SET);
+		litEtInverse_Section(elfFile, header, section);
+		
+		if (section->CONTENU_SEMANTIQUE == SHT_SYMTAB) {
+			break;
+		}
+	}
+}
+
 /* Arbre contenant toutes les variables 
  * globals de la table des symboles
 */
@@ -65,15 +79,17 @@ void verificationSymboleGlobal(Elf32_Sym symbole){
 void ecritureSymbolFichierElf(FILE* elfFileDest, Elf32_Sym symbole){
 	int nombre_symbol;
 	//voir comment obtenir le header du fichier résultat et la section
-	Elf32_Ehdr header = recupererEnteteFichierSource(elfFileDest);
-	Elf32_Shdr section = recupererSectionFichierSource(elfFileDest);
+	Elf32_Ehdr header;
+	litEtInverse_Header(elfFileDest, &header);
+	Elf32_Shdr section;
+ 	sectionTableSymbole(elfFileDest, header, &section);
 		
-	fseek(elfFileDest, header.DECALAGE_TABLE_ENTETE_SECTIONS + indice * sizeof(section), SEEK_SET);
+	/*fseek(elfFileDest, header.DECALAGE_TABLE_ENTETE_SECTIONS + indice * sizeof(section), SEEK_SET);
 	fread(&section, 1, sizeof(section), elfFile);
   	//printf("Name : %s\n",get_section_names(elfFile, sh_table, bigEndian) + sh_table.sh_name);
 	if (isbigendian(header)){
 		inversion_Sections(&section);
-    	}
+    	}*/
 	// calcul du nombre de symbole   	
 	nombre_symbol = section.TAILLE_SECTION / section.TAILLE_TABLE_ENTREE_FIXE;
   	fseek(elfFileDest, section.DECALAGE_DEBUT_FICHIER + sizeof(Elf32_Sym) * nombre_symbol, SEEK_SET);
@@ -110,7 +126,7 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 		switch(ELF32_ST_BIND(table_symbole.TYPE_SYMBOLE_ET_ATTRIBUT_LIAISON))
     		{
        	 		case 0: printf(" LOCAL ");
-				ecritureSymbolFichier(elfFileDest, table_symbole);
+				ecritureSymbolFichierElf(elfFileDest, table_symbole);
             			break;
         		case 1: printf(" GLOBAL ");
 				verificationSymboleGlobal(table_symbole);
