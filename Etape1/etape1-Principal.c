@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 	int choix = -1;
 	int numSection = -1;
 	if (argc != 4) {
-		printf("Utilisation : %s <ELF_FILE> AffichageVoulu NumSectionVoulue\n", argv[0]);
+		printf("Utilisation : %s <ELF_FILE> <ChoixDeLEtape> NumSectionVoulue\n", argv[0]);
 		exit(1);
 	} else {
 		elfFile = fopen(argv[1], "r");
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 		} else {
 			// Lit l'entête
 			litEtInverse_Header(elfFile, &header);
-			
+
 			// Est-ce que c'est bien un fichier elf ?
 			if (memcmp(header.e_ident, ELFMAG, SELFMAG) == 0) {
 				switch(choix){
