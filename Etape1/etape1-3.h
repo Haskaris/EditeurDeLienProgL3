@@ -1,15 +1,21 @@
+#ifndef __ETAPE1_3_H__
+#define __ETAPE1_3_H__
+//TODO: nettoyer les includes
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-#include "../librairie/lib-bigEndian.c"
+#include "../librairie/utils.h"
+#include "../librairie/lib-bigEndian.h"
+#include "../librairie/macro_section.h"
+#include "../librairie/macro_symbole.h"
+#include "../librairie/macro_header.h"
 
-/* Récupère le nom de la section
+/* Affiche le contenu d'une section
  * arguments :
  *	- le fichier ELF (elfFile) ouvert
  *	- entête du fichier ELF (header)
- *	- la table des entêtes du fichier ELF (section)
- *	- nom de la table (name)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
+ *	- entier qui correspond au numéro de la section que l'on veut afficher (numSection)
 */
-void get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, char* name, int bigEndian);
+void affichage_Contenu_Section(FILE *elfFile, Elf32_Ehdr header, int numSection);
+#endif  /* __ETAPE1_3_H__ */

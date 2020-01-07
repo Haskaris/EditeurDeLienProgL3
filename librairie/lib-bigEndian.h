@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef __LIB_BIG_ENDIAN_H__
+#define __LIB_BIG_ENDIAN_H__
 #include <elf.h>
 
 /* Retourne vrai si le fichier est au format BIG ENDIAN
@@ -9,27 +8,33 @@
 */
 int isbigendian(Elf32_Ehdr h);
 
-
-/* Inverse l'ordre des octets de n pour 16b
+/* Inverse toutes les valeurs du header
  * arguments :
- *	- l'entier à modifier (n)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
+ *	- l'entête du fichier ELF (*header)
 */
-uint16_t byteshift16(uint16_t n, int bigEndian);
+void inversion_Header(Elf32_Ehdr *header);
 
-
-/*Inverse l'ordre des octets de n pour 32b
+/* Inverse toutes les valeurs des sections
  * arguments :
- *	- l'entier à modifier (n)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
+ *	- l'entête de section du fichier ELF (*section)
 */
-uint32_t byteshift32(uint32_t n, int bigEndian);
+void inversion_Sections(Elf32_Shdr *section);
 
-
-/*Inverse l'ordre des octets de n pour 64b
+/* Inverse la table des symboles
  * arguments :
- *	- l'entier à modifier (n)
- *	- entier pour savoir si on est en bigENDIAN ou en litleENDIAN (bigEndian)
+ *	- table des symboles du fichier ELF (*sym_tbl)
 */
-uint64_t byteshift64(uint64_t n, int bigEndian);
+void insersion_Table_Symbole(Elf32_Sym *sym_tbl);
 
+/* Inverse la structure de repositionnement nécessitant un additif
+ * arguments :
+ *	- structure de repositionnement du ficheir ELF (*rela)
+*/
+void inversion_Relation_Additif(Elf32_Rela *rela);
+
+/* Inverse la structure de repositionnement ne nécessitant pas d'additif
+ * arguments :
+ *	- structure de repositionnement du ficheir ELF (*rela)
+*/
+void inversion_Relation_Sans_Additif(Elf32_Rel *rel);
+#endif
