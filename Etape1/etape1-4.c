@@ -6,7 +6,6 @@ char* get_symbol_name(FILE* elfFile,Elf32_Ehdr header,int i_table_chaine,int i_n
 	char* name = malloc(255);
 	fseek(elfFile, header.e_shoff + i_table_chaine * header.e_shentsize, SEEK_SET);
 	litEtInverse_Section(elfFile, header, &table_chaine);
-	//printf("\n\n\nMWA   %d\n\n",i_nom);
 	fseek(elfFile, table_chaine.sh_offset + i_nom, SEEK_SET);
 	char c = fgetc(elfFile);
 	int i = 0;

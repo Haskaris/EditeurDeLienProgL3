@@ -40,6 +40,15 @@ void litEtInverse_Header(FILE* elfFile, Elf32_Ehdr* header);
 */
 char* get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section);
 
+/* Lit la section passé en paramètre et l'inverse en
+ * fonction de big endian ou non
+ * Arguments :
+ *	- le fichier ELF (elfFile) ouvert
+ *	- entête du fichier ELF (header)
+ *	- structure de repositionnement sans additif (rel)
+*/
+void litEtInverse_Rel(FILE* elfFile, Elf32_Ehdr header, Elf32_Rel* rel);
+
 /* Inverse l'ordre des octets de n pour 16b
  * arguments :
  *	- l'entier à modifier (n)
