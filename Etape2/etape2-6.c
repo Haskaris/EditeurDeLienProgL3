@@ -1,19 +1,7 @@
 //Inclure les autres du .h ?
 #include "etape2-6.h"
 
-/*
- * A préciser / Changer pour get ?
- */
-uint64_t set_sh_entsize(uint32_t type) {
-	switch(type) {
-		case SHT_REL:
-			return 8;
-		case SHT_SYMTAB:
-			return 16;
-		default:
-			return 0;
-	}
-}
+
 
 /*
  * A préciser / Changer pour get ?
@@ -278,7 +266,8 @@ int fusion_section(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr*
 			offset_actuel += sectionOut.sh_size;
 			sectionOut.sh_link = set_sh_link(sectionOut.sh_type,section1.sh_link,symtab_index);
 			sectionOut.sh_info = section1.sh_info;
-			sectionOut.sh_entsize = set_sh_entsize(sectionOut.sh_type);
+			sectionOut.sh_entsize = section1.sh_entsize;
+			sectionOut.sh_addralign=section1.sh_addralign;
 
 			//On print la section
 			fwrite(&sectionOut, sizeof(sectionOut), 1, outputFile);
@@ -295,6 +284,7 @@ int fusion_section(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr*
 		} else {
 			//Pas de section de même nom et même type
 			//On print la section 1
+			section1.sh_offset = offset_actuel;
 			offset_actuel += section1.sh_size;
 			fwrite(&section1,sizeof(section1),1,outputFile);
 			//On sauvegarde la position du curseur
@@ -326,7 +316,8 @@ int fusion_section(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr*
 			offset_actuel += sectionOut.sh_size;
 			sectionOut.sh_link = set_sh_link(sectionOut.sh_type, section1.sh_link, symtab_index);
 			sectionOut.sh_info = set_sh_info(sectionOut.sh_type, section2.sh_info, renumerotation_section2);
-			sectionOut.sh_entsize = set_sh_entsize(sectionOut.sh_type);
+			sectionOut.sh_entsize = section2.sh_entsize;
+			sectionOut.sh_addralign=section2.sh_addralign;
 
 			fwrite(&sectionOut, sizeof(sectionOut), 1, outputFile);
 			//On sauvegarde la position du curseur
