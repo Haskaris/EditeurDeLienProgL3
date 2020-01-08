@@ -10,14 +10,14 @@ int main(int argc, char *argv[]) {
 	FILE * elfFile2;
 	FILE * outputFile;
 	int choix = -1;
-	if (argc != 4) {
+	if (argc != 5) {
 		printf("Utilisation : %s <ELF_FILE1> <ELF_FILE2> <OUTPUT_FILE> <choixNumero>\n", argv[0]);
 		exit(1);
 	} else {
 		elfFile1 = fopen(argv[1], "r");
 		elfFile2 = fopen(argv[2], "r");
-		outputFile = fopen(argv[3], "w");
-		choix = (int)(*argv[4]) - '0';
+		outputFile = fopen(argv[3], "w+");
+		choix = 3;//(int)(*argv[4]) - '0';
 		if (elfFile1 == NULL || elfFile2 == NULL) {
 			printf("Erreur lors de l'ouverture du fichier.\n");
 		} else {
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 					fusion_symbole(elfFile1, elfFile2, outputFile);
 					break;
 				case 3:
-					fusion_reimplementaton(elfFile1, elfFile2, outputFile);
+					fusion_reimplementation(elfFile1, elfFile2, outputFile);
 					break;
 				case 4:
 					printf("Etape 9 non implémenté");
@@ -37,10 +37,10 @@ int main(int argc, char *argv[]) {
 				default:
 					printf("Numero invalide ");
 			}
-			fclose(elfFile1);
-			fclose(elfFile2);
-			fclose(outputFile);
 		}
+		fclose(elfFile1);
+		fclose(elfFile2);
+		fclose(outputFile);
 	}
 	return 0;
 }
