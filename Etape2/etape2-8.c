@@ -170,19 +170,23 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 				sectionOut.sh_offset=offset_actuel;
 				sectionOut.sh_size = 0;
 				sectionOut.sh_link=set_sh_link(sectionOut.sh_type, section1.sh_link,symtab_index);
-				sectionOut.sh_info=section1.sh_info;
+				//sectionOut.sh_info=section1.sh_info;
+				printf("section sh info %u\n", sectionOut.sh_info);
 				sectionOut.sh_entsize=set_sh_entsize(sectionOut.sh_type);
 				int nombre_symbol =  tailleSectionTableSymbole(listeLocal, ArbreVariableGlobal);
-				printf("nombre symbole %d\n",nombre_symbol);			
+				printf("nombre symbole %d\n",nombre_symbol);	
+				sectionOut.sh_info = nombre_symbol;		
 				sectionOut.sh_size = nombre_symbol * sizeof(Elf32_Sym);
 				//On print la section
 				fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
 				//curseur_save = ftell(outputFile);
 				curseur=ftell(outputFile);//On sauvegarde la position du curseur
 				fseek(outputFile, sectionOut.sh_offset, SEEK_SET);//On va à la position de la section et on print les 2 sections à la suite
-				int indice = 1;
+				int indice = 0;
 				indice = ecritureSymbolLocalFichierElf(outputFile, &sectionOut, listeLocal, indice);
-				indice = ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal, indice);
+				printf("indice :::::: %d\n",indice);
+				indice = ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal->noeudGauche, indice);
+				indice = ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal->noeudDroit, indice);
 				offset_actuel += sectionOut.sh_size;
 				//fseek(outputFile,curseur_save,SEEK_SET); //On revient à la position initiale
 				//On print la section

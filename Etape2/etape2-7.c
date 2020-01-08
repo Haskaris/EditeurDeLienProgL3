@@ -123,7 +123,7 @@ int ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud
 	if (noeud == NULL){
 		return indice;
 	} else {
-		noeud->symboleCourant.st_shndx = indice;
+		//noeud->symboleCourant.st_shndx = indice;
 		afficheSymbole(noeud->symboleCourant);
 		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
 		//On augmente la taille de la section car on a ajouté un symbole
@@ -155,9 +155,12 @@ int ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct
 	indice--;
 	while (noeud != NULL){
 		//printf("i : %d\n", i);
+		if (noeud->suivant == NULL){
+			return indice;
+		}
 		//i++;
 		indice++;
-		noeud->symboleCourant.st_shndx=indice;
+		//noeud->symboleCourant.st_shndx=indice;
 		afficheSymbole(noeud->symboleCourant);
 		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
 		//On augmente la taille de la section car on a ajouté un symbole
