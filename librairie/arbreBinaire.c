@@ -48,12 +48,16 @@ void insereNoeudDansArbre(Noeud *Arbre, Elf32_Sym symbole){
 	}
 }
 
-void insereNoeudDansArbreLocal(NoeudLocal *Arbre, Elf32_Sym symbole){
-	while (Arbre != NULL){
-		Arbre = Arbre->suivant;
+void insereNoeudDansArbreLocal(NoeudLocal *liste, Elf32_Sym symbole){
+	int i = 0;
+	while (liste->suivant != NULL){
+		liste = liste->suivant;
+		i++;
 	}
+	printf("insereNoeudDansArbreLocal : %d\n", i);
 	NoeudLocal *nouveauNoeud = malloc(sizeof(NoeudLocal));
 	nouveauNoeud->suivant = NULL;
 	nouveauNoeud->symboleCourant = symbole;
-	Arbre = nouveauNoeud;
+	liste = nouveauNoeud;
+	
 }

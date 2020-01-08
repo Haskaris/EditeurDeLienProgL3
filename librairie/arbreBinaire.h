@@ -3,11 +3,15 @@
 
 typedef struct Noeud Noeud;
 typedef struct NoeudLocal NoeudLocal;
-
+typedef struct Liste Liste;
 struct Noeud {
 	Noeud *noeudGauche;
 	Noeud *noeudDroit;
 	Elf32_Sym symboleCourant;
+};
+
+struct Liste {
+	NoeudLocal *premier;
 };
 
 struct NoeudLocal {
@@ -35,4 +39,4 @@ Noeud* dansArbreDeRecherche(Noeud *noeud, Elf32_Sym symbole);
 void insereNoeudDansArbre(Noeud *Arbre, Elf32_Sym symbole);
 
 
-void insereNoeudDansArbreLocal(NoeudLocal *Arbre, Elf32_Sym symbole);
+void insereNoeudDansArbreLocal(NoeudLocal *liste, Elf32_Sym symbole);

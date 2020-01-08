@@ -150,12 +150,15 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 		}
 		if (j<header2.e_shnum){ //si une section de meme nom a été trouvée
 			if(section1.CONTENU_SEMANTIQUE == SHT_SYMTAB){
-				struct Noeud *ArbreVariableGlobal;
-				struct NoeudLocal *ArbreVariableLocal;
-				ArbreVariableGlobalInitialisation(ArbreVariableGlobal);
-				ArbreVariableLocalInitialisation(ArbreVariableLocal);
-				print_symbol_table32(elfFile1, header1, section1, i, ArbreVariableGlobal, ArbreVariableLocal);
-				print_symbol_table32(elfFile2, header2, section2, j, ArbreVariableGlobal, ArbreVariableLocal);
+				struct Noeud *ArbreVariableGlobal = malloc(sizeof(struct Noeud));
+				struct Liste *listeLocal = malloc(sizeof(struct Liste));
+				listeLocal->premier = NULL;
+				
+
+				//ArbreVariableGlobalInitialisation(ArbreVariableGlobal);
+				//ArbreVariableLocalInitialisation(ArbreVariableLocal);
+				print_symbol_table32(elfFile1, header1, section1, i, ArbreVariableGlobal, listeLocal);
+				print_symbol_table32(elfFile2, header2, section2, j, ArbreVariableGlobal, listeLocal);
 	
 				sections_deja_fusionnees[j]=1;
 				renumerotation_section2[j]=i;
@@ -172,7 +175,7 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 				fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
 				curseur=ftell(outputFile);//On sauvegarde la position du curseur
 				fseek(outputFile,sectionOut.sh_offset,SEEK_SET);//On va à la position de la section et on print les 2 sections à la suite
-				ecritureSymbolLocalFichierElf(outputFile, &sectionOut, ArbreVariableLocal);
+				ecritureSymbolLocalFichierElf(outputFile, &sectionOut, listeLocal);
 				ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal);
 				offset_actuel+=sectionOut.sh_size;
 
