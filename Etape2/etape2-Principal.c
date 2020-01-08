@@ -17,13 +17,13 @@ int main(int argc, char *argv[]) {
 		elfFile1 = fopen(argv[1], "r");
 		elfFile2 = fopen(argv[2], "r");
 		outputFile = fopen(argv[3], "w+");
-		choix = 3;//(int)(*argv[4]) - '0';
+		choix = (int)(*argv[4]) - '0';
 		if (elfFile1 == NULL || elfFile2 == NULL) {
 			printf("Erreur lors de l'ouverture du fichier.\n");
 		} else {
 			switch(choix){
 				case 1:
-					fusion_section(elfFile1, elfFile2, outputFile);
+					fusion_2_6(elfFile1, elfFile2, outputFile);
 					break;
 				case 2:
 					fusion_symbole(elfFile1, elfFile2, outputFile);

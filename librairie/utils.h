@@ -46,15 +46,20 @@ char* get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section);
 */
 uint16_t reverseByte16(uint16_t n);
 
-/*Inverse l'ordre des octets de n pour 32b
+/* Inverse l'ordre des octets de n pour 32b
  * arguments :
  *	- l'entier à modifier (n)
 */
 uint32_t reverseByte32(uint32_t n);
 
-/*Inverse l'ordre des octets de n pour 64b
+/* Inverse l'ordre des octets de n pour 64b
  * arguments :
  *	- l'entier à modifier (n)
 */
 uint64_t reverseByte64(uint64_t n);
+
+/* A préciser
+ *
+*/
+void file_copy(FILE* file1, FILE* file2, size_t size);
 #endif

@@ -37,12 +37,6 @@ char* get_section_name(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section) {
 	char* name = malloc(255);
 	fseek(elfFile, header.e_shoff + header.e_shstrndx * header.e_shentsize, SEEK_SET);
 	litEtInverse_Section(elfFile, header, &table_chaine);
-	/*fread(&table_chaine, 1, sizeof(Elf32_Shdr), elfFile);
-
-	//Si le fichier ELF n'est pas en litle Endian on l'inverse
-	if (isbigendian(header)) {
-		inversion_Sections(&table_chaine);
-	}*/
 
 	fseek(elfFile, table_chaine.sh_offset + section.sh_name, SEEK_SET);
 	char c = fgetc(elfFile);
@@ -70,4 +64,15 @@ uint64_t reverseByte64(uint64_t n) {
 				| ((n>>8)&0xff000000) | ((n<<24)&0xff0000000000)
 				| ((n>>40)&0xff00) | ((n<<40)&0xff000000000000)
 				| ((n<<56)&0xff00000000000000) | ((n>>56)&0xff);
+}
+
+
+/*
+ * A préciser
+ */
+void file_copy(FILE* file1, FILE* file2, size_t size) {
+	char* ptr = malloc(size);
+	fread(ptr, size, 1, file1);
+	fwrite(ptr, size, 1, file2);
+	free(ptr);
 }
