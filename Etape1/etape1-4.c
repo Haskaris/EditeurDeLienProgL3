@@ -3,6 +3,7 @@
 
 char* get_symbol_name(FILE* elfFile,Elf32_Ehdr header,int i_table_chaine,int i_nom){
 	Elf32_Shdr table_chaine;
+	int curseur=ftell(elfFile);
 	char* name = malloc(255);
 	fseek(elfFile, header.e_shoff + i_table_chaine * header.e_shentsize, SEEK_SET);
 	litEtInverse_Section(elfFile, header, &table_chaine);
@@ -15,6 +16,7 @@ char* get_symbol_name(FILE* elfFile,Elf32_Ehdr header,int i_table_chaine,int i_n
 		c=fgetc(elfFile);
 	}
 	name[i]='\0';
+	fseek(elfFile,curseur,SEEK_SET);
 	return name;
 }
 
@@ -23,7 +25,6 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 	uint32_t i;
 	uint32_t nombre_symbol;
 	uint32_t indice_table_chaine=section.sh_link;
-	int curseur;
 	//accéde à la table des symboles
 	fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + indice * sizeof(section), SEEK_SET);
 
@@ -100,10 +101,9 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 					"e64 switch ELF64_ST_VISIBILITY ");
 				break;
 		}
-		curseur=ftell(elfFile);
+
 		printf(" %x	", table_symbole.INDICE_TABLE_SECTION);
 		printf(" %s\n", get_symbol_name(elfFile,header,indice_table_chaine,table_symbole.NOM_SYMBOLE));
-		fseek(elfFile,curseur,SEEK_SET);
 	}
 }
 
