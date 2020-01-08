@@ -40,6 +40,12 @@ int get_symtab_index(FILE* fichier,Elf32_Ehdr header){
 	return -1;
 }
 
+uint32_t set_sh_info(uint32_t type, uint32_t info, int* renumerotation_section2){
+	if (type==SHT_REL){
+		return renumerotation_section2[info];
+	}
+	return 0;
+}
 void file_copy(FILE* file1, FILE* file2, size_t size){
 	char* ptr=malloc(size);
 	fread(ptr,size,1,file1);
@@ -102,7 +108,7 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 	Elf32_Shdr section1;
 	Elf32_Shdr section2;
 	Elf32_Shdr sectionOut;
-	int j;
+	int j,k;
 	int offset_actuel = sizeof(Elf32_Ehdr)+headerOutput->e_shnum*headerOutput->e_shentsize;
 	int curseur;
 	int symtab_index;
@@ -117,6 +123,11 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 	int sections_deja_fusionnees[header2.e_shnum];
 	for (int i=0;i<header2.e_shnum;i++){
 		sections_deja_fusionnees[i]=0;
+	}
+
+	int renumerotation_section2[header2.e_shnum];//Si i est l'ancien indice, nouvel indice est égal à renumerotation_section2[i]
+	for (int i=0;i<header2.e_shnum;i++){
+		renumerotation_section2[i]=-1;
 	}
 
 	symtab_index=get_symtab_index(elfFile1,header1);
@@ -140,7 +151,7 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 		}
 		if (j<header2.e_shnum){ //si une section de meme nom a été trouvée
 			sections_deja_fusionnees[j]=1;
-
+			renumerotation_section2[j]=i;
 			sectionOut.sh_name=section1.sh_name;
 			sectionOut.sh_type=section1.sh_type;
 			sectionOut.sh_flags=section1.sh_flags;
@@ -149,7 +160,7 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 			sectionOut.sh_size=section1.sh_size+section2.sh_size;
 			offset_actuel+=sectionOut.sh_size;
 			sectionOut.sh_link=set_sh_link(sectionOut.sh_type,section1.sh_link,symtab_index);
-			sectionOut.sh_info=0;
+			sectionOut.sh_info=section1.sh_info;
 			sectionOut.sh_entsize=set_sh_entsize(sectionOut.sh_type);
 			//On print la section
 			fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
@@ -170,7 +181,7 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 			sectionOut.sh_size=section1.sh_size;
 			offset_actuel+=sectionOut.sh_size;
 			sectionOut.sh_link=set_sh_link(sectionOut.sh_type,section1.sh_link,symtab_index);
-			sectionOut.sh_info=0;
+			sectionOut.sh_info=section1.sh_info;
 			sectionOut.sh_entsize=set_sh_entsize(sectionOut.sh_type);
 			//On print la section
 			fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
@@ -181,8 +192,10 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 			fseek(outputFile,curseur,SEEK_SET); //On revient à la position initiale
 		}
 	}
+	k=0;
 	for (int j=0;j<header2.e_shnum;j++){ //parcours des sections du fichier 2
 		if (sections_deja_fusionnees[j]==0){
+			renumerotation_section2[j]=k+header1.e_shnum;
 			fseek(elfFile2, header2.e_shoff + j * header2.e_shentsize, SEEK_SET);
 			litEtInverse_Section(elfFile2,header2,&section2);
 
@@ -194,7 +207,7 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 			sectionOut.sh_size=section2.sh_size;
 			offset_actuel+=sectionOut.sh_size;
 			sectionOut.sh_link=set_sh_link(sectionOut.sh_type,section1.sh_link,symtab_index);
-			sectionOut.sh_info=0;
+			sectionOut.sh_info=set_sh_info(sectionOut.sh_type,section2.sh_info,renumerotation_section2);
 			sectionOut.sh_entsize=set_sh_entsize(sectionOut.sh_type);
 			fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
 			curseur=ftell(outputFile);//On sauvegarde la position du curseur
@@ -202,6 +215,8 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 			fseek(elfFile2,section2.sh_offset,SEEK_SET);
 			file_copy(elfFile2,outputFile,section2.sh_size);
 			fseek(outputFile,curseur,SEEK_SET); //On revient à la position initiale
+
+			k++;
 		}
 	}
 	return 1;
