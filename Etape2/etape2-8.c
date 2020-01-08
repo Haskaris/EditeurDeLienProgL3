@@ -174,10 +174,11 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 				//On print la section
 				fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
 				curseur=ftell(outputFile);//On sauvegarde la position du curseur
-				fseek(outputFile,sectionOut.sh_offset,SEEK_SET);//On va à la position de la section et on print les 2 sections à la suite
-				ecritureSymbolLocalFichierElf(outputFile, &sectionOut, listeLocal);
-				ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal);
-				offset_actuel+=sectionOut.sh_size;
+				fseek(outputFile, sectionOut.sh_offset, SEEK_SET);//On va à la position de la section et on print les 2 sections à la suite
+				int indice = 1;
+				indice = ecritureSymbolLocalFichierElf(outputFile, &sectionOut, listeLocal, indice);
+				indice = ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal, indice);
+				offset_actuel += sectionOut.sh_size;
 
 				fseek(outputFile,curseur,SEEK_SET); //On revient à la position initiale	
 

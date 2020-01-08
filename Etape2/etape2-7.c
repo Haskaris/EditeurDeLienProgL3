@@ -119,36 +119,56 @@ void verificationSymboleGlobal(Elf32_Sym symbole, struct Noeud *ArbreVariableGlo
 }
 
 
-void ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud){
+int ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud, int indice){
 	if (noeud == NULL){
-		return;
+		return indice;
 	} else {
+		noeud->symboleCourant.st_shndx = indice;
 		afficheSymbole(noeud->symboleCourant);
 		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
 		//On augmente la taille de la section car on a ajouté un symbole
 		section->TAILLE_SECTION += sizeof(noeud->symboleCourant);
-		ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudGauche);
-		ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudDroit);
+		indice = ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudGauche, indice + 1);
+		indice = ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudDroit, indice + 1);
 	}
+	return indice;
 }
+
+
+/*
+void file_copy(FILE* file1, FILE* file2, size_t size){
+	char* ptr=malloc(size);
+	fread(ptr,size,1,file1);
+	fwrite(ptr,size,1,file2);
+	free(ptr);
+}
+
+*/
 
 /* PROBLEME 
  * Variable Global MAIN présente dans toutes 
  * les tables de symbôle, comment faire ???
 */
-void ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct Liste *listeLocal){
+int ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct Liste *listeLocal, int indice){
 	NoeudLocal *noeud = listeLocal->premier;
-	int i = 0;
+	//int i = 0;
+	indice--;
 	while (noeud != NULL){
-		printf("i : %d\n", i);
-		i++;
+		//printf("i : %d\n", i);
+		//i++;
+		indice++;
+		noeud->symboleCourant.st_shndx=indice;
 		afficheSymbole(noeud->symboleCourant);
 		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
 		//On augmente la taille de la section car on a ajouté un symbole
 		section->TAILLE_SECTION += sizeof(noeud->symboleCourant);
 		noeud = noeud->suivant;
 	}
+	return indice;
 }
+
+
+
 
 void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, uint32_t indice, struct Noeud *ArbreVariableGlobal, struct Liste *listeLocal){	
 	Elf32_Sym table_symbole;
@@ -176,7 +196,7 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 		switch(ELF32_ST_BIND(table_symbole.TYPE_SYMBOLE_ET_ATTRIBUT_LIAISON))
     		{
        	 		case 0: //printf(" LOCAL ");
-				printf("\ni lecture %d\n",i);
+				//printf("\ni lecture %d\n",i);
 				/*if (listeLocal->premier == NULL){
 					NoeudLocal *nouveauNoeud = malloc(sizeof(NoeudLocal));
 					nouveauNoeud->suivant = NULL;
