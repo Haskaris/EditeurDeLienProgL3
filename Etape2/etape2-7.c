@@ -127,7 +127,7 @@ int ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud
 		afficheSymbole(noeud->symboleCourant);
 		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
 		//On augmente la taille de la section car on a ajouté un symbole
-		section->TAILLE_SECTION += sizeof(noeud->symboleCourant);
+		//section->TAILLE_SECTION += sizeof(noeud->symboleCourant);
 		indice = ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudGauche, indice + 1);
 		indice = ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudDroit, indice + 1);
 	}
@@ -161,10 +161,33 @@ int ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct
 		afficheSymbole(noeud->symboleCourant);
 		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
 		//On augmente la taille de la section car on a ajouté un symbole
-		section->TAILLE_SECTION += sizeof(noeud->symboleCourant);
+		//section->TAILLE_SECTION += sizeof(noeud->symboleCourant);
 		noeud = noeud->suivant;
 	}
 	return indice;
+}
+
+int nombreSymbolGlobalFichierElf(Noeud *noeud, int indice){
+	if (noeud == NULL){
+		return indice;
+	} else {
+		//On augmente la taille de la section car on a ajouté un symbole
+		//section->TAILLE_SECTION += sizeof(noeud->symboleCourant);
+		indice = nombreSymbolGlobalFichierElf(noeud->noeudGauche, indice + 1);
+		indice = nombreSymbolGlobalFichierElf(noeud->noeudDroit, indice);
+	}
+	return indice;
+}
+int tailleSectionTableSymbole(struct Liste *listeLocal, struct Noeud *ArbreVariableGlobal){
+	int nb_symbole = 0;
+	NoeudLocal *noeud = listeLocal->premier;
+	while (noeud != NULL){
+		nb_symbole++;
+		noeud = noeud->suivant;
+	}
+	printf("nombre symbole local %d\n", nb_symbole);
+	nb_symbole = nombreSymbolGlobalFichierElf(ArbreVariableGlobal, nb_symbole);
+	return nb_symbole;
 }
 
 
