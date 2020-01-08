@@ -11,30 +11,25 @@
 #include "../librairie/macro_repositionnement.h"
 #include "../librairie/arbreBinaire.c"
 
-/* Ecrit tout les symboles globaux contenu dans l'arbre
- * arguments :
- *	- Le fichier ELF destinations (elfFileDest)
- *	- L'arbre contenant tous les symboles globaux (*noeudCourant) 
-*/
-void ecritureSymboleGlobaux(FILE *elfFileDest, struct Noeud *noeudCourant);
-
 /* Initialise l'arbre des symboles globaux
 */
-void ArbreVariableGlobalInitialisation();
 
+void ArbreVariableGlobalInitialisation(struct Noeud *ArbreVariableGlobal);
+
+void ArbreVariableLocalInitialisation(struct NoeudLocal *ArbreVariableLocal);
 /* Vérifie les conditions sur les symboles globaux, si
  * le symbole n'y est pas il est ajouté.
  * arguments :
  * 	- le symbole global à ajouter (symbole)
 */
-void verificationSymboleGlobal(Elf32_Sym symbole);
+void verificationSymboleGlobal(Elf32_Sym symbole, struct Noeud *ArbreVariableGlobal);
 
-/* Ecrit le symbole dans le fichier ELF
+/* Ecrit les symboles locaux dans le fichier ELF
  * arguments : 
  * 	- le fichier elf destination (elfFileDest)
  *	- le symbole à écrire dans le fichier (symbole)
 */
-void ecritureSymbolFichierElf(FILE* elfFileDest, Elf32_Sym symbole);
+void ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct NoeudLocal *ArbreVariableLocal);
 
 /* PROBLEME 
  * Variable Global MAIN présente dans toutes 
@@ -48,31 +43,21 @@ void ecritureSymbolFichierElf(FILE* elfFileDest, Elf32_Sym symbole);
  *	- l'indice de la section contenant la table des symboles (indice)
  *	- le fichier ELF destination (elfFileDest)
 */
-void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, uint32_t indice, FILE* elfFileDest);
+void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, uint32_t indice, struct Noeud *ArbreVariableGlobal, struct NoeudLocal *ArbreVariableLocal);
 
-/* Trouve la section, du fichier ELF à copier, contenant
- * la table des symboles 
- * arguments :
- * 	- fichier ELF à copier (elfFile)
- *	- l'entête du fichier ELF à copier (header)
- *	- fichier ELF destination (elfFileDest)
-*/
-void stockage_table_symbol_init32(FILE *elfFile, Elf32_Ehdr header, FILE* elfFileDest);
 
-/* Ecrit la table des symboles dans le fichier
- * ELF destination
- * arguments :
- * 	- l'entête du premier fichier ELF à copier (header1)
- *	- l'entête du deuxième fichier ELF à copier (header2)
- *	- fichier ELF destination (elfFileDest)
- * 	- premier fichier ELF source (elfFileSource)
- *	- deuxième fichier ELF source (elfFileSource1)
-*/
-void write_Symbol_Table(Elf32_Ehdr header1, Elf32_Ehdr header2, FILE *elfFileDest, FILE *elfFileSource, FILE *elfFileSource1);
 
-/* fonction principal
+
+
+
+void ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud);
+
+/* PROBLEME 
+ * Variable Global MAIN présente dans toutes 
+ * les tables de symbôle, comment faire ???
 */
-void fusion_symbole(FILE * elfFile1, FILE * elfFile2, FILE * outputFile);
+
+
 
 
 #endif  /* __ETAPE2_7_H__ */

@@ -47,3 +47,13 @@ void insereNoeudDansArbre(Noeud *Arbre, Elf32_Sym symbole){
 		}
 	}
 }
+
+void insereNoeudDansArbreLocal(NoeudLocal *Arbre, Elf32_Sym symbole){
+	while (Arbre != NULL){
+		Arbre = Arbre->suivant;
+	}
+	NoeudLocal *nouveauNoeud = malloc(sizeof(NoeudLocal));
+	nouveauNoeud->suivant = NULL;
+	nouveauNoeud->symboleCourant = symbole;
+	Arbre = nouveauNoeud;
+}

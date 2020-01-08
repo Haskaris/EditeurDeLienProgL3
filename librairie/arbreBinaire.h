@@ -2,10 +2,16 @@
 #include <stdlib.h>
 
 typedef struct Noeud Noeud;
+typedef struct NoeudLocal NoeudLocal;
 
 struct Noeud {
 	Noeud *noeudGauche;
 	Noeud *noeudDroit;
+	Elf32_Sym symboleCourant;
+};
+
+struct NoeudLocal {
+	NoeudLocal *suivant;
 	Elf32_Sym symboleCourant;
 };
 
@@ -27,3 +33,6 @@ Noeud* dansArbreDeRecherche(Noeud *noeud, Elf32_Sym symbole);
  *	- le symbole global à ajouter dans l'arbre (symbole)
 */
 void insereNoeudDansArbre(Noeud *Arbre, Elf32_Sym symbole);
+
+
+void insereNoeudDansArbreLocal(NoeudLocal *Arbre, Elf32_Sym symbole);

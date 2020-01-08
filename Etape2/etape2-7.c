@@ -3,44 +3,20 @@
 #include <string.h>
 #include <elf.h>
 #include "etape2-7.h"
+#include "etape2-8.h"
 void fusion_symbole(FILE * elfFile1, FILE * elfFile2, FILE * outputFile) {
 	return;
 }
 
-void sectionTableSymbole(FILE *elfFile, Elf32_Ehdr header, Elf32_Shdr *section){
-	uint32_t i;
-	//parcours la table des entêtes et
-	//cherche la section contenant la table des symboles (SHT_SYMTAB)
-	for(i=0; i < header.NOMBRE_ENTREE_TABLE_SECTIONS; i++) {
-		fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(*section), SEEK_SET);
-		litEtInverse_Section(elfFile, header, section);
-		
-		if (section->CONTENU_SEMANTIQUE == SHT_SYMTAB) {
-			break;
-		}
-	}
-}
-
-/* Arbre contenant toutes les variables 
- * globals de la table des symboles
-*/
-struct Noeud *ArbreVariableGlobal;
-
-void ecritureSymboleGlobaux(FILE *elfFileDest, struct Noeud *noeudCourant){
-	if (!noeudCourant){
-		return;
-	} else {
-		ecritureSymbolFichierElf(elfFileDest, noeudCourant->symboleCourant);
-		ecritureSymboleGlobaux(elfFileDest, noeudCourant->noeudGauche);
-		ecritureSymboleGlobaux(elfFileDest, noeudCourant->noeudDroit);
-	}
-}
-
-void ArbreVariableGlobalInitialisation(){
+void ArbreVariableGlobalInitialisation(struct Noeud *ArbreVariableGlobal){
 	ArbreVariableGlobal = malloc(sizeof(ArbreVariableGlobal));
 }
 
-void verificationSymboleGlobal(Elf32_Sym symbole){
+void ArbreVariableLocalInitialisation(struct NoeudLocal *ArbreVariableLocal){
+	ArbreVariableLocal = malloc(sizeof(ArbreVariableLocal));
+}
+
+void verificationSymboleGlobal(Elf32_Sym symbole, struct Noeud *ArbreVariableGlobal){
 	struct Noeud* symboleGlobal = dansArbreDeRecherche(ArbreVariableGlobal, symbole);
 	if (!symboleGlobal){
 		/*
@@ -72,64 +48,63 @@ void verificationSymboleGlobal(Elf32_Sym symbole){
 	}
 }
 
+
+void ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud){
+	if (noeud == NULL){
+		return;
+	} else {
+		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
+		//On augmente la taille de la section car on a ajouté un symbole
+		section->TAILLE_SECTION += sizeof(noeud->symboleCourant);
+		ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudGauche);
+		ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudDroit);
+	}
+}
+
 /* PROBLEME 
  * Variable Global MAIN présente dans toutes 
  * les tables de symbôle, comment faire ???
 */
-void ecritureSymbolFichierElf(FILE* elfFileDest, Elf32_Sym symbole){
-	int nombre_symbol;
-	//voir comment obtenir le header du fichier résultat et la section
-	Elf32_Ehdr header;
-	litEtInverse_Header(elfFileDest, &header);
-	Elf32_Shdr section;
- 	sectionTableSymbole(elfFileDest, header, &section);
-		
-	/*fseek(elfFileDest, header.DECALAGE_TABLE_ENTETE_SECTIONS + indice * sizeof(section), SEEK_SET);
+void ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct NoeudLocal *ArbreVariableLocal){
+	NoeudLocal *noeud = ArbreVariableLocal;
+	while (noeud != NULL){
+		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
+		//On augmente la taille de la section car on a ajouté un symbole
+		section->TAILLE_SECTION += sizeof(noeud->symboleCourant);
+		noeud = noeud->suivant;
+	}
+}
+
+void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, uint32_t indice, struct Noeud *ArbreVariableGlobal, struct NoeudLocal *ArbreVariableLocal){	
+	Elf32_Sym table_symbole;
+	uint32_t i, nombre_symbol;
+	//accéde à la table des symboles
+	/*fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + indice * sizeof(section), SEEK_SET);
 	fread(&section, 1, sizeof(section), elfFile);
   	//printf("Name : %s\n",get_section_names(elfFile, sh_table, bigEndian) + sh_table.sh_name);
 	if (isbigendian(header)){
 		inversion_Sections(&section);
     	}*/
-	// calcul du nombre de symbole   	
-	nombre_symbol = section.TAILLE_SECTION / section.TAILLE_TABLE_ENTREE_FIXE;
-  	fseek(elfFileDest, section.DECALAGE_DEBUT_FICHIER + sizeof(Elf32_Sym) * nombre_symbol, SEEK_SET);
-	
-	//verification !!!	
-	fwrite(&symbole, 1, sizeof(symbole), elfFileDest);
-	//On augmente la taille de la section car on a ajouté un symbole
-	section.TAILLE_SECTION += sizeof(symbole);
-}
-
-void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, uint32_t indice, FILE* elfFileDest){	
-	Elf32_Sym table_symbole;
-	uint32_t i, nombre_symbol;
 	//accéde à la table des symboles
 	fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + indice * sizeof(section), SEEK_SET);
-	fread(&section, 1, sizeof(section), elfFile);
-  	//printf("Name : %s\n",get_section_names(elfFile, sh_table, bigEndian) + sh_table.sh_name);
-	if (isbigendian(header)){
-		inversion_Sections(&section);
-    	}
+
+	litEtInverse_Section(elfFile, header, &section);
 	// calcul du nombre de symbole   	
 	nombre_symbol = section.TAILLE_SECTION / section.TAILLE_TABLE_ENTREE_FIXE;
   	fseek(elfFile, section.DECALAGE_DEBUT_FICHIER, SEEK_SET);
 
 	printf("La table de symboles << .symtab >> contient %d entrées :\n", nombre_symbol);
-	printf("  Num:   Valeur     Tail  Type  Lien  Vis     Ndx Nom\n");
         
 	//on affiche les informations du symbole
 	for(i=0; i< nombre_symbol; i++) {
-		fread(&table_symbole, 1, sizeof(table_symbole), elfFile);
-		if (isbigendian(header)){
-			insersion_Table_Symbole(&table_symbole);
-		}
+		litEtInverse_TalbeSymbole(elfFile, header, &table_symbole);
 		switch(ELF32_ST_BIND(table_symbole.TYPE_SYMBOLE_ET_ATTRIBUT_LIAISON))
     		{
        	 		case 0: printf(" LOCAL ");
-				ecritureSymbolFichierElf(elfFileDest, table_symbole);
+				insereNoeudDansArbreLocal(ArbreVariableLocal, table_symbole);
             			break;
         		case 1: printf(" GLOBAL ");
-				verificationSymboleGlobal(table_symbole);
+				verificationSymboleGlobal(table_symbole, ArbreVariableGlobal);
             			break;
         		case 2: printf("Cas jamais trouvé, type WEAK (etape2-7.c)\n");
             			break;
@@ -138,38 +113,57 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
         		default: printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_table32 switch ELF32_ST_BIND ");
         			break;
     		}
+		/*switch(ELF32_ST_BIND(table_symbole.TYPE_SYMBOLE_ET_ATTRIBUT_LIAISON)) {
+			case 0:
+				printf(" LOCAL ");
+				break;
+			case 1:
+				printf(" GLOBAL ");
+				break;
+			case 2:
+				printf(" WEAK ");
+				break;
+			case 3:
+				printf("	NUM ");
+				break;
+			default:
+				printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_tabl"
+					"e32 switch ELF32_ST_BIND ");
+				break;
+		}*/
 	}
 }
 
 
-void stockage_table_symbol_init32(FILE *elfFile, Elf32_Ehdr header, FILE* elfFileDest) {
-	uint32_t i;
-	Elf32_Shdr section;
-	//parcours la table des entêtes et 
-	//cherche la section contenant la table des symboles (SHT_SYMTAB)		
-	for(i=0; i < header.NOMBRE_ENTREE_TABLE_SECTIONS; i++) {
-		fseek(elfFile, header.DECALAGE_TABLE_ENTETE_SECTIONS + i * sizeof(section), SEEK_SET);
-         	fread(&section, 1, sizeof(section), elfFile);
-		if (isbigendian(header)){
-			inversion_Sections(&section);
-		}
-		if (section.CONTENU_SEMANTIQUE ==SHT_SYMTAB) {
-			print_symbol_table32(elfFile, header, section, i, elfFileDest);
-			break;
-		}
-	}
-}
 
-void write_Symbol_Table(Elf32_Ehdr header1, Elf32_Ehdr header2, FILE *elfFileDest, FILE *elfFileSource, FILE *elfFileSource1){
-	/*
-		Ecrit la table des symboles et la stocke dans le fichier destination
-	*/
-	// Init ArbreVariableGlobal
+
+/*
+void initTableSymbole(FILE *elfFile1, FILE *elfFile2, FILE *outputFile, Elf32_Ehdr header1, Elf32_Ehdr header2, Elf32_Shdr section1, Elf32_Shdr section2, Elf32_Shdr *sectionOut, int indice1, int indice2, int *offset_actuel, int *curseur){
 	ArbreVariableGlobalInitialisation();
-	stockage_table_symbol_init32(elfFileSource, header1, elfFileDest);
-	stockage_table_symbol_init32(elfFileSource1, header2, elfFileDest);
-	//écriture de tout les symbole globaux dans le fichier
-	ecritureSymboleGlobaux(elfFileDest, ArbreVariableGlobal);
-	return;
-}
+	ArbreVariableLocal();
+	print_symbol_table32(elfFile1, header1, section1, indice1);
+	print_symbol_table32(elfFile2, header2, section2, indice2);
 
+	sections_deja_fusionnees[j]=1;
+	renumerotation_section2[j]=i;
+	sectionOut->sh_name=section1.sh_name;
+	sectionOut->sh_type=section1.sh_type;
+	sectionOut->sh_flags=section1.sh_flags;
+	sectionOut->sh_addr=section1.sh_addr;
+	sectionOut->sh_offset=*offset_actuel;
+	sectionOut->sh_size = 0;
+	sectionOut->sh_link=set_sh_link(sectionOut->sh_type,section1.sh_link,symtab_index);
+	sectionOut->sh_info=section1.sh_info;
+	sectionOut->sh_entsize=set_sh_entsize(sectionOut.sh_type);
+	//On print la section
+	fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
+	*curseur=ftell(outputFile);//On sauvegarde la position du curseur
+	fseek(outputFile,sectionOut->sh_offset,SEEK_SET);//On va à la position de la section et on print les 2 sections à la suite
+	ecritureSymbolLocalFichierElf(outputFile, sectionOut);
+	ecritureSymbolGlobalFichierElf(outputFile, sectionOut, ArbreVariableGlobal);
+	*offset_actuel+=sectionOut->sh_size;
+
+	fseek(outputFile,curseur,SEEK_SET); //On revient à la position initiale	
+
+}
+*/

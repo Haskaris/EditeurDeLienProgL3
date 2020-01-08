@@ -4,7 +4,6 @@
 #include <elf.h>
 #include "etape2-8.h"
 
-
 uint64_t set_sh_entsize(uint32_t type){
 	switch(type){
 		case SHT_REL:
@@ -150,27 +149,59 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 			nom_section2=get_section_name(elfFile2,header2,section2);
 		}
 		if (j<header2.e_shnum){ //si une section de meme nom a été trouvée
-			sections_deja_fusionnees[j]=1;
-			renumerotation_section2[j]=i;
-			sectionOut.sh_name=section1.sh_name;
-			sectionOut.sh_type=section1.sh_type;
-			sectionOut.sh_flags=section1.sh_flags;
-			sectionOut.sh_addr=section1.sh_addr;
-			sectionOut.sh_offset=offset_actuel;
-			sectionOut.sh_size=section1.sh_size+section2.sh_size;
-			offset_actuel+=sectionOut.sh_size;
-			sectionOut.sh_link=set_sh_link(sectionOut.sh_type,section1.sh_link,symtab_index);
-			sectionOut.sh_info=section1.sh_info;
-			sectionOut.sh_entsize=set_sh_entsize(sectionOut.sh_type);
-			//On print la section
-			fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
-			curseur=ftell(outputFile);//On sauvegarde la position du curseur
-			fseek(outputFile,sectionOut.sh_offset,SEEK_SET);//On va à la position de la section et on print les 2 sections à la suite
-			fseek(elfFile1,section1.sh_offset,SEEK_SET);
-			file_copy(elfFile1,outputFile,section1.sh_size);
-			fseek(elfFile2,section2.sh_offset,SEEK_SET);
-			file_copy(elfFile2,outputFile,section2.sh_size);
-			fseek(outputFile,curseur,SEEK_SET); //On revient à la position initiale
+			if(section1.CONTENU_SEMANTIQUE == SHT_SYMTAB){
+				struct Noeud *ArbreVariableGlobal;
+				struct NoeudLocal *ArbreVariableLocal;
+				ArbreVariableGlobalInitialisation(ArbreVariableGlobal);
+				ArbreVariableLocalInitialisation(ArbreVariableLocal);
+				print_symbol_table32(elfFile1, header1, section1, i, ArbreVariableGlobal, ArbreVariableLocal);
+				print_symbol_table32(elfFile2, header2, section2, j, ArbreVariableGlobal, ArbreVariableLocal);
+	
+				sections_deja_fusionnees[j]=1;
+				renumerotation_section2[j]=i;
+				sectionOut.sh_name=section1.sh_name;
+				sectionOut.sh_type=section1.sh_type;
+				sectionOut.sh_flags=section1.sh_flags;
+				sectionOut.sh_addr=section1.sh_addr;
+				sectionOut.sh_offset=offset_actuel;
+				sectionOut.sh_size = 0;
+				sectionOut.sh_link=set_sh_link(sectionOut.sh_type, section1.sh_link,symtab_index);
+				sectionOut.sh_info=section1.sh_info;
+				sectionOut.sh_entsize=set_sh_entsize(sectionOut.sh_type);
+				//On print la section
+				fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
+				curseur=ftell(outputFile);//On sauvegarde la position du curseur
+				fseek(outputFile,sectionOut.sh_offset,SEEK_SET);//On va à la position de la section et on print les 2 sections à la suite
+				ecritureSymbolLocalFichierElf(outputFile, &sectionOut, ArbreVariableLocal);
+				ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal);
+				offset_actuel+=sectionOut.sh_size;
+
+				fseek(outputFile,curseur,SEEK_SET); //On revient à la position initiale	
+
+			} else {
+				sections_deja_fusionnees[j]=1;
+				renumerotation_section2[j]=i;
+				sectionOut.sh_name=section1.sh_name;
+				sectionOut.sh_type=section1.sh_type;
+				sectionOut.sh_flags=section1.sh_flags;
+				sectionOut.sh_addr=section1.sh_addr;
+				sectionOut.sh_offset=offset_actuel;
+				sectionOut.sh_size=section1.sh_size+section2.sh_size;
+				offset_actuel+=sectionOut.sh_size;
+				sectionOut.sh_link=set_sh_link(sectionOut.sh_type, section1.sh_link,symtab_index);
+				sectionOut.sh_info=section1.sh_info;
+				sectionOut.sh_entsize=set_sh_entsize(sectionOut.sh_type);
+				//On print la section
+				fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
+				curseur=ftell(outputFile);//On sauvegarde la position du curseur
+				fseek(outputFile,sectionOut.sh_offset,SEEK_SET);//On va à la position de la section et on print les 2 sections à la suite
+				fseek(elfFile1,section1.sh_offset,SEEK_SET);
+				file_copy(elfFile1,outputFile,section1.sh_size);
+				fseek(elfFile2,section2.sh_offset,SEEK_SET);
+				file_copy(elfFile2,outputFile,section2.sh_size);
+				fseek(outputFile,curseur,SEEK_SET); //On revient à la position initiale	
+			}
+			
 		}
 		else{
 			sectionOut.sh_name=section1.sh_name;
@@ -206,8 +237,8 @@ int fusion_section_2eme_tentative(FILE* elfFile1, FILE* elfFile2, FILE* outputFi
 			sectionOut.sh_offset=offset_actuel;
 			sectionOut.sh_size=section2.sh_size;
 			offset_actuel+=sectionOut.sh_size;
-			sectionOut.sh_link=set_sh_link(sectionOut.sh_type,section1.sh_link,symtab_index);
-			sectionOut.sh_info=set_sh_info(sectionOut.sh_type,section2.sh_info,renumerotation_section2);
+			sectionOut.sh_link=set_sh_link(sectionOut.sh_type, section1.sh_link, symtab_index);
+			sectionOut.sh_info = set_sh_info(sectionOut.sh_type, section2.sh_info, renumerotation_section2);
 			sectionOut.sh_entsize=set_sh_entsize(sectionOut.sh_type);
 			fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
 			curseur=ftell(outputFile);//On sauvegarde la position du curseur
