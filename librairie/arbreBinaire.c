@@ -31,7 +31,7 @@ void insereNoeudDansArbre(Noeud *Arbre, Elf32_Sym symbole){
 	} else if (Arbre->symboleCourant.NOM_SYMBOLE < symbole.NOM_SYMBOLE){
 		if (Arbre->noeudGauche == NULL){
 			Noeud *nouveauNoeud = malloc(sizeof(struct Noeud));
-			nouveauNoeud->symboleCourant.NOM_SYMBOLE = symbole.NOM_SYMBOLE;
+			nouveauNoeud->symboleCourant = symbole;
 			Arbre->noeudGauche = nouveauNoeud;
 		} else {
 			return insereNoeudDansArbre(Arbre->noeudGauche, symbole);
@@ -40,7 +40,7 @@ void insereNoeudDansArbre(Noeud *Arbre, Elf32_Sym symbole){
 		//noeud->name > name
 		if (Arbre->noeudDroit == NULL){
 			Noeud *nouveauNoeud = malloc(sizeof(struct Noeud));
-			nouveauNoeud->symboleCourant.NOM_SYMBOLE = symbole.NOM_SYMBOLE;
+			nouveauNoeud->symboleCourant = symbole;
 			Arbre->noeudDroit = nouveauNoeud;
 		} else {
 			return insereNoeudDansArbre(Arbre->noeudDroit, symbole);
