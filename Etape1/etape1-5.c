@@ -56,7 +56,7 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
 			//Penser à free
 			nom_section = get_section_name(elfFile, header, section);
 
-			int nb_entree = (int)section.TAILLE_SECTION / sizeof(Elf32_Rela);
+			int nb_entree = (int)section.sh_size / sizeof(Elf32_Rela);
 			printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section,section.sh_offset,nb_entree);
 			fseek(elfFile, section.sh_offset, SEEK_SET);
 			for (int i=0;i<nb_entree;i++){

@@ -6,9 +6,6 @@
 #include <string.h>
 #include <elf.h>
 #include "../librairie/utils.h"
-#include "../librairie/macro_section.h"
-#include "../librairie/macro_symbole.h"
-#include "../librairie/macro_header.h"
 #include "../librairie/lib-bigEndian.h"
 
 /* Créer la table des symboles, la lit dans le fichier ELF
