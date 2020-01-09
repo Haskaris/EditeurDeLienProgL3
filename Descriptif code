@@ -10,6 +10,7 @@ La fonction fusion_2_6 (Etape2/etape2-6.c) produit un fichier au format ELF en p
 en entrée, et en concaténant les sections en commun.
 La fonction fusion 2_7 (Etape2/etape2-7.c) reprend la fonction précédente en ajoutant une condition pour corriger
 la table des symboles.
+Bogue : Elle ne fonctionne pas sur certains ordinateurs.
 Nous n'avons pas fait la correction des tables de réimplantations.
 
 Certaines fonctions auxiliaires sont définies dans les fichiers librairie/utils.c et librairie/lil-bigEndian.c.
