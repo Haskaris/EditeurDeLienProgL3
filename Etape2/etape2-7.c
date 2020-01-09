@@ -13,7 +13,6 @@ int fusion_2_7(FILE * elfFile1, FILE * elfFile2, FILE * outputFile) {
 
 	deroulement = fusion_header(elfFile1, elfFile2, outputFile, &headerOutput);
 
-
 	//Il y a eu un problème ?
 	if (deroulement) {
 		//Oui
@@ -101,14 +100,6 @@ void afficheSymbole(Elf32_Sym table_symbole){
 		printf(" %02x\n", table_symbole.st_name);
 }
 
-void ArbreVariableGlobalInitialisation(struct Noeud *ArbreVariableGlobal){
-	ArbreVariableGlobal = NULL;//malloc(sizeof(ArbreVariableGlobal));
-}
-
-void ArbreVariableLocalInitialisation(struct NoeudLocal *ArbreVariableLocal){
-	ArbreVariableLocal = NULL;//malloc(sizeof(ArbreVariableLocal));
-}
-
 void verificationSymboleGlobal(Elf32_Sym symbole, struct Noeud *ArbreVariableGlobal){
 	struct Noeud* symboleGlobal = dansArbreDeRecherche(ArbreVariableGlobal, symbole);
 	if (!symboleGlobal){
@@ -118,10 +109,10 @@ void verificationSymboleGlobal(Elf32_Sym symbole, struct Noeud *ArbreVariableGlo
 		*/
 		insereNoeudDansArbre(ArbreVariableGlobal, symbole);
 	} else {
-		//2 symboles de même nom
+		//Deux symboles de même nom
 		/*
-			- si un symbole défini dans l’une des deux tables apparaı̂t comme non défini
-				dans l’autre, seule la définition devra apparaı̂tre
+			- si un symbole défini dans l’une des deux tables apparaît comme non défini
+				dans l’autre, seule la définition devra apparaître
 				dans la table de sortie
 			- si deux symboles apparaissent comme non définis dans les deux tables en
 				entrée, une seule entrée pour ce symbole devra être
@@ -183,7 +174,7 @@ int nombreSymbolGlobalFichierElf(Noeud *noeud, int indice){
 	return indice;
 }
 
-int tailleSectionTableSymbole(struct Liste *listeLocal, struct Noeud *ArbreVariableGlobal){
+int tailleSectionTableSymbole(struct Liste *listeLocal, struct Noeud *ArbreVariableGlobal) {
 	int nb_symbole = 0;
 	NoeudLocal *noeud = listeLocal->premier;
 	while (noeud != NULL){
@@ -195,7 +186,8 @@ int tailleSectionTableSymbole(struct Liste *listeLocal, struct Noeud *ArbreVaria
 	return nb_symbole;
 }
 
-void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, uint32_t indice, struct Noeud *ArbreVariableGlobal, struct Liste *listeLocal){
+void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section,
+		uint32_t indice, struct Noeud *ArbreVariableGlobal, struct Liste *listeLocal) {
 	Elf32_Sym table_symbole;
 	uint32_t i, nombre_symbol;
 	//accéde à la table des symboles
@@ -209,21 +201,23 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 	//on affiche les informations du symbole
 	for(i=0; i< nombre_symbol; i++) {
 		litEtInverse_TalbeSymbole(elfFile, header, &table_symbole);
-		switch(ELF32_ST_BIND(table_symbole.st_info))
-    		{
-       	 		case 0:
+		switch(ELF32_ST_BIND(table_symbole.st_info)) {
+			case 0:
 				insererEnTeteListe(listeLocal, table_symbole);
-	    			break;
-        		case 1:
+				break;
+			case 1:
 				verificationSymboleGlobal(table_symbole, ArbreVariableGlobal);
-            			break;
-        		case 2: printf("Cas jamais trouvé, type WEAK (etape2-7.c)\n");
-            			break;
-        		case 3: printf("Cas jamais trouvé, type NUM (etape2-7.c)\n");
-            			break;
-        		default: printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_table32 switch ELF32_ST_BIND ");
-        			break;
-    		}
+				break;
+			case 2:
+				printf("Cas jamais trouvé, type WEAK (etape2-7.c)\n");
+				break;
+			case 3:
+				printf("Cas jamais trouvé, type NUM (etape2-7.c)\n");
+				break;
+			default:
+				printf(" Cas non géré fichier enteteEtape4.c fonction print_symbol_table32 switch ELF32_ST_BIND ");
+				break;
+		}
 	}
 }
 
@@ -243,7 +237,6 @@ int fusion_section_2_7(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_E
 	int curseur = 0;
 	//Permet de sauvegarder l'index de symtab_index
 	int symtab_index = 0;
-
 
 	//Permet de sauvegarder la taille de shtstrtab
 	size_t taille_shtstrtab;
@@ -307,11 +300,11 @@ int fusion_section_2_7(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_E
 
 				sections_deja_fusionnees[j]=1;
 				renumerotation_section2[j]=i;
-				sectionOut.sh_name=section1.sh_name;
-				sectionOut.sh_type=section1.sh_type;
-				sectionOut.sh_flags=section1.sh_flags;
-				sectionOut.sh_addr=section1.sh_addr;
-				sectionOut.sh_offset=offset_actuel;
+				sectionOut.sh_name = section1.sh_name;
+				sectionOut.sh_type = section1.sh_type;
+				sectionOut.sh_flags = section1.sh_flags;
+				sectionOut.sh_addr = section1.sh_addr;
+				sectionOut.sh_offset = offset_actuel;
 				sectionOut.sh_link = get_sh_link(sectionOut.sh_type, section1.sh_link,symtab_index);
 				sectionOut.sh_entsize = section1.sh_entsize;
 				sectionOut.sh_addralign = section1.sh_addralign;
