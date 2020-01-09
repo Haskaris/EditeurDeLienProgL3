@@ -132,15 +132,15 @@ void verificationSymboleGlobal(Elf32_Sym symbole, struct Noeud *ArbreVariableGlo
 }
 
 
-void ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud){
+void ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Noeud *noeud){
 	if (noeud == NULL){
 		return ;
 	} else {
-		afficheSymbole(noeud->symboleCourant);
+		//afficheSymbole(noeud->symboleCourant);
 		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
 		//On augmente la taille de la section car on a ajouté un symbole
-		ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudGauche);
-		ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudDroit);
+		ecritureSymbolGlobalFichierElf(elfFileDest, noeud->noeudGauche);
+		ecritureSymbolGlobalFichierElf(elfFileDest, noeud->noeudDroit);
 	}
 	return;
 }
@@ -149,13 +149,13 @@ void ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeu
  * Variable Global MAIN présente dans toutes
  * les tables de symbôle, comment faire ???
 */
-void ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct Liste *listeLocal){
+void ecritureSymbolLocalFichierElf(FILE* elfFileDest, struct Liste *listeLocal){
 	NoeudLocal *noeud = listeLocal->premier;
 	while (noeud != NULL){
 		if (noeud->suivant == NULL){
 			return;
 		}
-		afficheSymbole(noeud->symboleCourant);
+		//afficheSymbole(noeud->symboleCourant);
 		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
 		//On augmente la taille de la section car on a ajouté un symbole
 		noeud = noeud->suivant;
@@ -181,7 +181,7 @@ int tailleSectionTableSymbole(struct Liste *listeLocal, struct Noeud *ArbreVaria
 		nb_symbole++;
 		noeud = noeud->suivant;
 	}
-	printf("nombre symbole local %d\n", nb_symbole);
+	//printf("nombre symbole local %d\n", nb_symbole);
 	nb_symbole = nombreSymbolGlobalFichierElf(ArbreVariableGlobal, nb_symbole);
 	return nb_symbole;
 }
@@ -289,14 +289,12 @@ int fusion_section_2_7(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_E
 		//Si une section de même nom et de même type a été trouvée
 		if (j < header2.e_shnum) {
 			if(section1.sh_type == SHT_SYMTAB) {
-				printf("Avant ici\n");
 				struct Noeud *ArbreVariableGlobal = malloc(sizeof(struct Noeud));
 				struct Liste *listeLocal = malloc(sizeof(struct Liste));
 				listeLocal->premier = NULL;
 
 				print_symbol_table32(elfFile1, header1, section1, i, ArbreVariableGlobal, listeLocal);
 				print_symbol_table32(elfFile2, header2, section2, j, ArbreVariableGlobal, listeLocal);
-				printf("111111111111111111111111\n");
 
 				sections_deja_fusionnees[j]=1;
 				renumerotation_section2[j]=i;
@@ -308,25 +306,25 @@ int fusion_section_2_7(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_E
 				sectionOut.sh_link = get_sh_link(sectionOut.sh_type, section1.sh_link,symtab_index);
 				sectionOut.sh_entsize = section1.sh_entsize;
 				sectionOut.sh_addralign = section1.sh_addralign;
-				printf("33333333333333333333\n");
 				int nombre_symbol =  tailleSectionTableSymbole(listeLocal, ArbreVariableGlobal);
-				printf("3.1111111111\n");
 				sectionOut.sh_info = nombre_symbol;
 				sectionOut.sh_size = nombre_symbol * sizeof(Elf32_Sym);
 				//On print la section
 
-				printf("44444444444444444444\n");
 				fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
 				//On sauvegarde la position du curseur
 				curseur = ftell(outputFile);
 				fseek(outputFile, sectionOut.sh_offset, SEEK_SET);
-				printf("55555555555555555555\n");
-				ecritureSymbolLocalFichierElf(outputFile, &sectionOut, listeLocal);
-				ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal->noeudGauche);
-				ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal->noeudDroit);
+				ecritureSymbolLocalFichierElf(outputFile, listeLocal);
+
+				/*on appelle la fonction 2 fois car le premier noeud de l'arbre ne doit 
+				  pas être écrit (manque de temps pour changer ça 
+				  -> solution juste faire une tete qui pointe sur l'arbre 
+				*/
+				ecritureSymbolGlobalFichierElf(outputFile, ArbreVariableGlobal->noeudGauche);
+				ecritureSymbolGlobalFichierElf(outputFile, ArbreVariableGlobal->noeudDroit);
 				offset_actuel += sectionOut.sh_size;
 				fseek(outputFile, curseur, SEEK_SET); //On revient à la position initiale
-				printf("99999999999999999999\n");
 			} else {
 				sections_deja_fusionnees[j] = 1;
 				renumerotation_section2[j] = i;
