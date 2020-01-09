@@ -301,4 +301,3 @@ void initTableSymbole(FILE *elfFile1, FILE *elfFile2, FILE *outputFile, Elf32_Eh
 	fseek(outputFile,curseur,SEEK_SET); //On revient à la position initiale
 
 }
-*/

@@ -1,0 +1,38 @@
+Pourquoi utiliser un git :
+ - Tout d'abord un git est un VCS (Version Source Controller), ça nous permet d'acceder à diverses versions du code.
+   Chaque commit va faire une "sauvegarde" du code actuel, il est possible de faire X commits avant de faire un push,
+   ils seront tous affichés dans le git.
+ - Outre l'aspect de gestion de version un git nous permet également de travailler à plusieurs sur un projet sans se marcher dessus.
+   Grâce au système de branche nous pouvons travailler de notre côté sans que quelqu'un vienne effacer tout notre travail.
+
+Je pense avoir pas trop trop mal expliqué pourquoi il est nécessaire d'utiliser un VCS même pour un projet solo.
+
+Comment utiliser un git :
+ - Avant tout il faut une clé ssh pour confirmer que c'est bien nous qui utilisons le git.
+   Du coup il faut faire la génération de la clé ssh avec 'ssh-keygen', valider 3 fois (la première fois c'est pour le chemin du fichier,
+   ne rien mettre utilise le chemin par défaut, les deux autres fois c'est pour un mot de passe)
+   Une fois la clé générée il faut l'ajouter sur le git (github, gitlab ou ce que vous voulez) pour faire la connexion
+
+   Sauf exception votre VCS est maintenant connecté à votre ordinateur et réciproquement !
+
+ - Ensuite vous devez "télécharger" ou "clone" le git
+   Pour ça rien de plus simple : 'git clone adresseSSHDuGit'
+
+   À ce niveau vous devez avoir un nouveau dossier contenant le git, déplacez vous dedans (cd)
+
+ - Là git sait que l'ordinateur est autorisé mais ne sait pas qui vous êtes !
+   Les utilisateurs doivent être ajoutés au projet et dans l'invité de commande vous devez rentrer
+   'git config --global user.name "bob"' et 'git config --global user.email "bob@foo.fr"'
+
+   Là tout est bon !
+
+Les commandes :
+ - git checkout : Permet de se déplacer de branche en branche. L'option -b permet de créer la branche.
+ - git commit : Permet de 'sauvegarder' nos modifications comme expliqué plus haut. L'option -m permet de rajouter un message.
+ - git pull : Permet de récupérer les modifications effectués par les autres utilisateurs.
+ - git push : Permet d'envoyer en lignes nos modifications. Nécéssite un commit au préalable.
+ - git fetch : Je sais qu'elle existe mais je ne sais pas précisement ce qu'elle fait.
+ - git merge X : Fusionne la branche X sur la branche actuelle (penser à faire un 'git pull' de la branche X au préalable)
+
+Ce qu'il faut savoir faire :
+ Une fois que vous avez fait votre travail, vous faites un commit puis un push sur votre branche ! C'est pas sorcier =)

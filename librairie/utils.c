@@ -31,7 +31,6 @@ void litEtInverse_Header(FILE* elfFile, Elf32_Ehdr* header) {
 
 void litEtInverse_Rel(FILE* elfFile, Elf32_Ehdr header, Elf32_Rel* rel) {
 	fread(rel, sizeof(Elf32_Rel), 1, elfFile);
-
 	if (isbigendian(header)) {
 		inversion_Relation_Sans_Additif(rel);
 	}
