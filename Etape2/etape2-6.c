@@ -1,7 +1,6 @@
 //Inclure les autres du .h ?
 #include "etape2-6.h"
 
-
 /*
  * A préciser / Changer pour get ?
  */
@@ -241,12 +240,13 @@ int fusion_section(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr*
 
 		//Parcours des sections du fichier 2
 		//Tant que les sections n'ont pas le même nom et pas le même type
-		do{
+		do {
 			j++;
 			fseek(elfFile2, header2.e_shoff + j * header2.e_shentsize, SEEK_SET);
 			litEtInverse_Section(elfFile2, header2, &section2);
 			nom_section2 = get_section_name(elfFile2, header2, section2);
-		} while((strcmp(nom_section1, nom_section2) || section1.sh_type != section2.sh_type)&& (j < header2.e_shnum));
+		} while((strcmp(nom_section1, nom_section2) || section1.sh_type != section2.sh_type) && (j < header2.e_shnum));
+		
 		//Si une section de même nom et de même type a été trouvée
 		if (j < header2.e_shnum) {
 			sections_deja_fusionnees[j] = 1;
@@ -278,6 +278,7 @@ int fusion_section(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr*
 		} else {
 			//Pas de section de même nom et même type
 			//On print la section 1
+			section1.sh_offset = offset_actuel;
 			offset_actuel += section1.sh_size;
 			fwrite(&section1,sizeof(section1),1,outputFile);
 			//On sauvegarde la position du curseur
