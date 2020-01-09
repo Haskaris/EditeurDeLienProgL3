@@ -178,12 +178,9 @@ int nombreSymbolGlobalFichierElf(Noeud *noeud, int indice){
 	if (noeud == NULL){
 		return indice;
 	} else {
-		printf("AAVVAANNTT\n");
 		//On augmente la taille de la section car on a ajouté un symbole
 		indice = nombreSymbolGlobalFichierElf(noeud->noeudGauche, indice + 1);
-		printf("PPEENNDDAANNTT %d\n", indice);
 		indice = nombreSymbolGlobalFichierElf(noeud->noeudDroit, indice);
-		printf("AAPPRREESS %d\n", indice);
 	}
 	return indice;
 }
