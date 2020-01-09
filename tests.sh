@@ -77,11 +77,15 @@ do
 
 		for ((i=1; i<3; i++))
 		do
-			echo $i
 			((j=i+1))
-			echo $j
 			echo -e "\nFichier du dossier Examples_loader : $i"
 			./elfParsing "../Examples_loader/example$i.o" "../Examples_loader/example$j.o" "fusion_$i.o" $choix
+			echo -e "fichier example$i.o :\n"
+			readelf -S "../Examples_loader/example$i.o"
+			echo -e "\nfichier example$j.o :\n"
+			readelf -S "../Examples_loader/example$j.o"
+			echo -e "fusion des fichiers example$i.o et example$j.o :\n"
+			readelf -S "fusion_$i.o"
 		done
 		cd ..
 		echo -e "\n\n"
