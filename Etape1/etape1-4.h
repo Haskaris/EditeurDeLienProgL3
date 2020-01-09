@@ -6,9 +6,6 @@
 #include <string.h>
 #include <elf.h>
 #include "../librairie/utils.h"
-#include "../librairie/macro_section.h"
-#include "../librairie/macro_symbole.h"
-#include "../librairie/macro_header.h"
 #include "../librairie/lib-bigEndian.h"
 
 /* Créer la table des symboles, la lit dans le fichier ELF
@@ -28,13 +25,4 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
  *	- entête du fichier ELF (header)
 */
 void affichage_Table_Des_Symbole(FILE *elfFile, Elf32_Ehdr header);
-
-/*Sert à récuperer le nom d'un symbole dans la table des chaines
- *arguments :
- *	- le fichier ELF (elfFile) ouvert
- *	- entête du fichier ELF (header)
- *	- l'indice de l'entête de section de la table des chaines de symboles (i_table_chaine)
- *	- l'indice du nom du symbole dans la table des chaines (i_nom)
- */
-char* get_symbol_name(FILE* elfFile,Elf32_Ehdr header,int i_table_chaine,int i_nom);
 #endif  /* __ETAPE1_4_H__ */

@@ -11,11 +11,14 @@ int main(int argc, char *argv[]) {
 	int choix = -1;
 	int numSection = -1;
 	if (argc != 4) {
-		printf("Utilisation : %s <ELF_FILE> <ChoixDeLEtape> NumSectionVoulue\n", argv[0]);
+		printf("Utilisation : %s <ELF_FILE> <ChoixDeLEtape> NumSectionVoulue"
+		"\n Mettre n'importe quel numero de section si l'étape n'est pas la 3.\n", argv[0]);
 		exit(1);
 	} else {
 		elfFile = fopen(argv[1], "r");
+
 		choix = (int)(*argv[2]) - '0';
+
 		numSection = (int)(*argv[3]) - '0';
 		if (elfFile == NULL) {
 			printf("Erreur lors de l'ouverture du fichier.\n");

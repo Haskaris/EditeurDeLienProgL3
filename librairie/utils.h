@@ -28,6 +28,24 @@ void litEtInverse_TalbeSymbole(FILE* elfFile, Elf32_Ehdr header, Elf32_Sym* tabl
  * Arguments :
  *	- le fichier ELF (elfFile) ouvert
  *	- entête du fichier ELF (header)
+ *	- (rel)
+*/
+void litEtInverse_Rel(FILE* elfFile, Elf32_Ehdr header, Elf32_Rel* rel);
+
+/* Lit la section passé en paramètre et l'inverse en
+ * fonction de big endian ou non
+ * Arguments :
+ *	- le fichier ELF (elfFile) ouvert
+ *	- entête du fichier ELF (header)
+ *	- (rela)
+*/
+void litEtInverse_Rela(FILE* elfFile, Elf32_Ehdr header, Elf32_Rela* rela);
+
+/* Lit la section passé en paramètre et l'inverse en
+ * fonction de big endian ou non
+ * Arguments :
+ *	- le fichier ELF (elfFile) ouvert
+ *	- entête du fichier ELF (header)
 */
 void litEtInverse_Header(FILE* elfFile, Elf32_Ehdr* header);
 
@@ -66,6 +84,17 @@ uint32_t reverseByte32(uint32_t n);
  *	- l'entier à modifier (n)
 */
 uint64_t reverseByte64(uint64_t n);
+
+
+
+/* Sert à récuperer le nom d'un symbole dans la table des chaines
+ * arguments :
+ *	- le fichier ELF (elfFile) ouvert
+ *	- entête du fichier ELF (header)
+ *	- l'indice de l'entête de section de la table des chaines de symboles (i_table_chaine)
+ *	- l'indice du nom du symbole dans la table des chaines (i_nom)
+ */
+char* get_symbol_name(FILE* elfFile,Elf32_Ehdr header,int i_table_chaine,int i_nom);
 
 /* A préciser
  *

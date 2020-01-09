@@ -123,7 +123,7 @@ void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header) {
 	// read all section headers
 	printf("Il y a %d sections dans le fichier\n.", header.e_shnum);
 	headtext();
-	for (int i = 0; i < header.NOMBRE_ENTREE_TABLE_SECTIONS; i++) {
+	for (int i = 0; i < header.e_shnum; i++) {
 		const char* name = "";
 
 		fseek(elfFile, DECALAGE(header, i), SEEK_SET);
@@ -137,15 +137,15 @@ void affichage_Table_Sections(FILE *elfFile, Elf32_Ehdr header) {
 		printf("%s ",nom_section);
 		align(nom_section, 18);
 
-		typeToString(section.CONTENU_SEMANTIQUE);
-		printf("%08x ", section.ADRESSE_MEMOIRE);
-		printf("%06x ", section.DECALAGE_DEBUT_FICHIER);
-		printf("%06x ", section.TAILLE_SECTION);
-		printf("%02x ", section.TAILLE_TABLE_ENTREE_FIXE);
-		flagsToString(section.DRAPEAUX_ATTRIBUTS);
-		printf("%u ", section.LIEN_INDICE_TABLE_SECTION);
-		printf("%u ", section.INFORMATIONS_COMPLEMENTAIRES);
-		printf("%u\n", section.CONTRAINTE_D_ALIGNEMENT);
+		typeToString(section.sh_type);
+		printf("%08x ", section.sh_addr);
+		printf("%06x ", section.sh_offset);
+		printf("%06x ", section.sh_size);
+		printf("%02x ", section.sh_entsize);
+		flagsToString(section.sh_flags);
+		printf("%u ", section.sh_link);
+		printf("%u ", section.sh_info);
+		printf("%u\n", section.sh_addralign);
 	}
 	foottext();
 }

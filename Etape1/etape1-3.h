@@ -7,9 +7,6 @@
 #include <elf.h>
 #include "../librairie/utils.h"
 #include "../librairie/lib-bigEndian.h"
-#include "../librairie/macro_section.h"
-#include "../librairie/macro_symbole.h"
-#include "../librairie/macro_header.h"
 
 /* Affiche le contenu d'une section
  * arguments :

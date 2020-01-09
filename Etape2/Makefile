@@ -11,3 +11,4 @@ etape2-Principal.o: etape2-Principal.c etape2-Principal.h etape2-6.c \
 
 elfParsing: etape2-Principal.o
 	$(CC) -o $@ $^
+

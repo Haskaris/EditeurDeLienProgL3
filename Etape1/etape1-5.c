@@ -56,11 +56,12 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
 			//Penser à free
 			nom_section = get_section_name(elfFile, header, section);
 
-			int nb_entree = (int)section.TAILLE_SECTION / sizeof(Elf32_Rela);
-			printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section,section.sh_offset,nb_entree);
+			int nb_entree = (int)section.sh_size / sizeof(Elf32_Rela);
+			printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",
+				nom_section, section.sh_offset, nb_entree);
 			fseek(elfFile, section.sh_offset, SEEK_SET);
 			for (int i=0;i<nb_entree;i++){
-				fread(&rela,1,sizeof(rela),elfFile);
+				litEtInverse_Rela(elfFile, header, &rela);
 				printf("décalage : %012x  ", rela.r_offset);
 				printf("type : ");
 				afficher_relocation_type(ELF32_R_TYPE(rela.r_info));
@@ -75,16 +76,16 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
 			nom_section = get_section_name(elfFile, header, section);
 
 			int nb_entree=(int)section.sh_size/sizeof(Elf32_Rel);
-			printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section,section.sh_offset,nb_entree);
+			printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",
+				nom_section, section.sh_offset, nb_entree);
 			fseek(elfFile, section.sh_offset, SEEK_SET);
-			for (int i=0;i<nb_entree;i++){
-				//fread(&rel,1,sizeof(rel),elfFile);
-				litEtInverse_Rel(elfFile,header,&rel);
-				printf("décalage : %012x  ",rel.r_offset);
+			for (int i = 0; i < nb_entree; i++) {
+				litEtInverse_Rel(elfFile, header, &rel);
+				printf("décalage : %012x  ", rel.r_offset);
 				printf("type : ");
 				afficher_relocation_type(ELF32_R_TYPE(rel.r_info));
 				printf("  ");
-				printf("index : %u \n",ELF32_R_SYM(rel.r_info));
+				printf("index : %u \n", ELF32_R_SYM(rel.r_info));
 			}
 			printf("\n");
 		}
