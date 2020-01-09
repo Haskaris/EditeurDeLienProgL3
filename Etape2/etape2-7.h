@@ -28,7 +28,7 @@ void verificationSymboleGlobal(Elf32_Sym symbole, struct Noeud *ArbreVariableGlo
  * 	- le fichier elf destination (elfFileDest)
  *	- le symbole à écrire dans le fichier (symbole)
 */
-int ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct Liste *listeLocal, int indice);
+void ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct Liste *listeLocal);
 
 /* PROBLEME
  * Variable Global MAIN présente dans toutes
@@ -49,7 +49,7 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 
 
 
-int ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud, int indice);
+void ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud);
 
 /* PROBLEME
  * Variable Global MAIN présente dans toutes

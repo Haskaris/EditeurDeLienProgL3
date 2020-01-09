@@ -141,37 +141,35 @@ void verificationSymboleGlobal(Elf32_Sym symbole, struct Noeud *ArbreVariableGlo
 }
 
 
-int ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud, int indice){
+void ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud){
 	if (noeud == NULL){
-		return indice;
+		return ;
 	} else {
 		afficheSymbole(noeud->symboleCourant);
 		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
 		//On augmente la taille de la section car on a ajouté un symbole
-		indice = ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudGauche, indice + 1);
-		indice = ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudDroit, indice + 1);
+		ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudGauche);
+		ecritureSymbolGlobalFichierElf(elfFileDest, section, noeud->noeudDroit);
 	}
-	return indice;
+	return;
 }
 
 /* PROBLEME
  * Variable Global MAIN présente dans toutes
  * les tables de symbôle, comment faire ???
 */
-int ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct Liste *listeLocal, int indice){
+void ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct Liste *listeLocal){
 	NoeudLocal *noeud = listeLocal->premier;
-	indice--;
 	while (noeud != NULL){
 		if (noeud->suivant == NULL){
-			return indice;
+			return;
 		}
-		indice++;
 		afficheSymbole(noeud->symboleCourant);
 		fwrite(&(noeud->symboleCourant), sizeof(noeud->symboleCourant), 1, elfFileDest);
 		//On augmente la taille de la section car on a ajouté un symbole
 		noeud = noeud->suivant;
 	}
-	return indice;
+	return;
 }
 
 int nombreSymbolGlobalFichierElf(Noeud *noeud, int indice){
@@ -330,10 +328,9 @@ int fusion_section_2_7(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_E
 				curseur = ftell(outputFile);
 				fseek(outputFile, sectionOut.sh_offset, SEEK_SET);
 				printf("55555555555555555555\n");
-				int indice = 0;
-				indice = ecritureSymbolLocalFichierElf(outputFile, &sectionOut, listeLocal, indice);
-				indice = ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal->noeudGauche, indice);
-				indice = ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal->noeudDroit, indice);
+				ecritureSymbolLocalFichierElf(outputFile, &sectionOut, listeLocal);
+				ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal->noeudGauche);
+				ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal->noeudDroit);
 				offset_actuel += sectionOut.sh_size;
 				fseek(outputFile, curseur, SEEK_SET); //On revient à la position initiale
 				printf("99999999999999999999\n");
