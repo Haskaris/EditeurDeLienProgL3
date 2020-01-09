@@ -1,10 +1,7 @@
 //Inclure les autres du .h ?
 #include "etape2-6.h"
 
-/*
- * A préciser / Changer pour get ?
- */
-uint32_t set_sh_link(uint32_t type, uint32_t section1_link, int symtab_index) {
+uint32_t get_sh_link(uint32_t type, uint32_t section1_link, int symtab_index) {
 	switch(type) {
 		case SHT_REL:
 			return symtab_index;
@@ -15,9 +12,6 @@ uint32_t set_sh_link(uint32_t type, uint32_t section1_link, int symtab_index) {
 	}
 }
 
-/*
- * A préciser
- */
 int get_symtab_index(FILE* fichier, Elf32_Ehdr header) {
 	Elf32_Shdr section;
 	for(int i = 0; i < header.e_shnum; i++) {
@@ -30,24 +24,13 @@ int get_symtab_index(FILE* fichier, Elf32_Ehdr header) {
 	return -1;
 }
 
-/*
- * A préciser / Changer pour get ?
- */
-uint32_t set_sh_info(uint32_t type, uint32_t info, int* renumerotation_section2) {
+uint32_t get_sh_info(uint32_t type, uint32_t info, int* renumerotation_section2) {
 	if (type == SHT_REL){
 		return renumerotation_section2[info];
 	}
 	return 0;
 }
 
-/*
- * Fusionne les headers de deux fichiers
- * Paramètres:
- * - Fichier à fusionner 1 (elfFile1)
- * - Fichier à fusionner 2 (elfFile2)
- * - Fichier fusionné (outputFile)
- * - Header fusionné (headerOutput)
- */
 int fusion_header(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr* headerOutput) {
 	//Headers des fichiers 1 et 2
 	Elf32_Ehdr header1;
@@ -90,36 +73,13 @@ int fusion_header(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr* 
 		//Ce champ indique l'adresse virtuelle à laquelle le système transfère initialement le contrôle,
 		//démarrant ainsi le processus. Si ce fichier ne possède pas de point d'entrée, ce champ contient zéro.
 		headerOutput->e_entry = 0;
-		//TODO: Est-ce que ça ne serait pas mieux ?
-		/*
-		if (header1.e_phoff != 0 && header2.e_phoff != 0) {
-			//Chacun a un décalage, on prend le plus faible
-			headerOutput->e_phoff = min(header1.e_phoff, header2.e_phoff);
-		} else {
-			//Un décalage ou plus est égal à zéro, on prend donc celui qui n'est potentiellement
-			//pas égal à zéro (Si les deux valent zéro le max est zéro)
-			headerOutput->e_phoff = max(header1.e_phoff, header2.e_phoff);
-		}
-		*/
 
 		//Ce champ contient le décalage en octets de la table contenant l'entête de programme.
 		//Si ce fichier ne contient pas de table d'entête de programme, ce champ contient zéro.
 		headerOutput->e_phoff = 0;
-		//TODO: Est-ce que ce ne serait pas mieux ?
-		/*
-		if (header1.e_phoff != 0 && header2.e_phoff != 0) {
-			//Chacun a un décalage, on prend le plus faible
-			headerOutput->e_phoff = min(header1.e_phoff, header2.e_phoff);
-		} else {
-			//Un décalage ou plus est égal à zéro, on prend donc celui qui n'est potentiellement
-			//pas égal à zéro (Si les deux valent zéro le max est zéro)
-			headerOutput->e_phoff = max(header1.e_phoff, header2.e_phoff);
-		}
-		*/
 
 		//Ce champ contient le décalage en octets de la table des entêtes de sections.
 		//Si ce fichier ne contient pas de table des entêtes des sections, ce champ contient zéro.
-		//TODO: Changer pour ajouter la condition
 		headerOutput->e_shoff = sizeof(Elf32_Ehdr);
 
 		//Ce champ contient des drapeaux spécifiques au processeur. Le nom de ces drapeaux prend la forme :
@@ -131,10 +91,6 @@ int fusion_header(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr* 
 		//e_phentsize par e_phnum. Si le fichier ne contient pas d'entête de programme,
 		//e_phnum contiendra la valeur zéro.
 		headerOutput->e_phnum = 0;
-		//TODO: Est-ce que ce ne serait pas mieux ?
-		/*
-		headerOutput->e_phnum = header1.e_phnum + header2.e_phnum;
-		*/
 
 		//Ce champ contient la taille en octets d'un entête de section. Un entête de
 		//section est une entrée de la table des entêtes de sections ; toutes les
@@ -173,14 +129,6 @@ int fusion_header(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr* 
 	return 0; //La fusion s'est bien passée
 }
 
-/*
- * Fusionne les sections de deux fichiers
- * Paramètres:
- * - Fichier à fusionner 1 (elfFile1)
- * - Fichier à fusionner 2 (elfFile2)
- * - Fichier fusionné (outputFile)
- * - Header fusionné au préalable (headerOutput)
- */
 int fusion_section(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr* headerOutput) {
 	//Headers des fichiers 1 et 2
 	Elf32_Ehdr header1;
@@ -246,7 +194,7 @@ int fusion_section(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr*
 			litEtInverse_Section(elfFile2, header2, &section2);
 			nom_section2 = get_section_name(elfFile2, header2, section2);
 		} while((strcmp(nom_section1, nom_section2) || section1.sh_type != section2.sh_type) && (j < header2.e_shnum));
-		
+
 		//Si une section de même nom et de même type a été trouvée
 		if (j < header2.e_shnum) {
 			sections_deja_fusionnees[j] = 1;
@@ -258,7 +206,7 @@ int fusion_section(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr*
 			sectionOut.sh_offset = offset_actuel;
 			sectionOut.sh_size = section1.sh_size + section2.sh_size;
 			offset_actuel += sectionOut.sh_size;
-			sectionOut.sh_link = set_sh_link(sectionOut.sh_type,section1.sh_link,symtab_index);
+			sectionOut.sh_link = get_sh_link(sectionOut.sh_type,section1.sh_link,symtab_index);
 			sectionOut.sh_info = section1.sh_info;
 			sectionOut.sh_entsize = section1.sh_entsize;
 			sectionOut.sh_addralign=section1.sh_addralign;
@@ -308,8 +256,8 @@ int fusion_section(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr*
 			sectionOut.sh_offset = offset_actuel;
 			sectionOut.sh_size = section2.sh_size;
 			offset_actuel += sectionOut.sh_size;
-			sectionOut.sh_link = set_sh_link(sectionOut.sh_type, section1.sh_link, symtab_index);
-			sectionOut.sh_info = set_sh_info(sectionOut.sh_type, section2.sh_info, renumerotation_section2);
+			sectionOut.sh_link = get_sh_link(sectionOut.sh_type, section1.sh_link, symtab_index);
+			sectionOut.sh_info = get_sh_info(sectionOut.sh_type, section2.sh_info, renumerotation_section2);
 			sectionOut.sh_entsize = section2.sh_entsize;
 			sectionOut.sh_addralign=section2.sh_addralign;
 
@@ -331,7 +279,6 @@ int fusion_section(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr*
 int fusion_2_6(FILE * elfFile1, FILE * elfFile2, FILE * outputFile) {
 	//Permet de savoir si ça s'est bien passé ou non
 	int deroulement = 0;
-	//TODO: Le changer en pointeur ?
 	Elf32_Ehdr headerOutput;
 
 	deroulement = fusion_header(elfFile1, elfFile2, outputFile, &headerOutput);

@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 					fusion_2_6(elfFile1, elfFile2, outputFile);
 					break;
 				case 2:
-					fusion_symbole(elfFile1, elfFile2, outputFile);
+					fusion_2_7(elfFile1, elfFile2, outputFile);
 					break;
 				case 3:
 					fusion_reimplementation(elfFile1, elfFile2, outputFile);

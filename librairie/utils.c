@@ -81,6 +81,24 @@ uint64_t reverseByte64(uint64_t n) {
 				| ((n<<56)&0xff00000000000000) | ((n>>56)&0xff);
 }
 
+char* get_symbol_name(FILE* elfFile, Elf32_Ehdr header, int i_table_chaine, int i_nom) {
+	Elf32_Shdr table_chaine;
+	int curseur = ftell(elfFile);
+	char* name = malloc(255);
+	fseek(elfFile, header.e_shoff + i_table_chaine * header.e_shentsize, SEEK_SET);
+	litEtInverse_Section(elfFile, header, &table_chaine);
+	fseek(elfFile, table_chaine.sh_offset + i_nom, SEEK_SET);
+	char c = fgetc(elfFile);
+	int i = 0;
+	while((c != '\0') && (i < 250)) {
+		name[i] = c;
+		i++;
+		c = fgetc(elfFile);
+	}
+	name[i] = '\0';
+	fseek(elfFile, curseur, SEEK_SET);
+	return name;
+}
 
 /*
  * A préciser

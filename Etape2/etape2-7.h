@@ -4,12 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
-//#include "../librairie/lib-bigEndian.c"
 #include "../librairie/arbreBinaire.c"
+
+
+int fusion_2_7(FILE * elfFile1, FILE * elfFile2, FILE * outputFile);
+
+int fusion_section_2_7(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_Ehdr* headerOutput);
 
 /* Initialise l'arbre des symboles globaux
 */
-
 void ArbreVariableGlobalInitialisation(struct Noeud *ArbreVariableGlobal);
 
 void ArbreVariableLocalInitialisation(struct NoeudLocal *ArbreVariableLocal);
