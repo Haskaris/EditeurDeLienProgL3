@@ -5,10 +5,6 @@
 #include <string.h>
 #include <elf.h>
 //#include "../librairie/lib-bigEndian.c"
-#include "../librairie/macro_section.h"
-#include "../librairie/macro_symbole.h"
-#include "../librairie/macro_header.h"
-#include "../librairie/macro_repositionnement.h"
 #include "../librairie/arbreBinaire.c"
 
 /* Initialise l'arbre des symboles globaux
@@ -25,18 +21,18 @@ void ArbreVariableLocalInitialisation(struct NoeudLocal *ArbreVariableLocal);
 void verificationSymboleGlobal(Elf32_Sym symbole, struct Noeud *ArbreVariableGlobal);
 
 /* Ecrit les symboles locaux dans le fichier ELF
- * arguments : 
+ * arguments :
  * 	- le fichier elf destination (elfFileDest)
  *	- le symbole à écrire dans le fichier (symbole)
 */
 int ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struct Liste *listeLocal, int indice);
 
-/* PROBLEME 
- * Variable Global MAIN présente dans toutes 
+/* PROBLEME
+ * Variable Global MAIN présente dans toutes
  * les tables de symbôle, comment faire ???
  * Parcours la table des symboles d'un fichier
  * et donne les variables à écrire dans le fichier destination
- * arguments : 
+ * arguments :
  * 	- le fichier elf de la table des symbole à copier (elfFile)
  *	- l'entête du fichier ELF à copier (header)
  *	- la table des sections du fichier ELF à copier (section)
@@ -52,8 +48,8 @@ void print_symbol_table32(FILE* elfFile, Elf32_Ehdr header, Elf32_Shdr section, 
 
 int ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud, int indice);
 
-/* PROBLEME 
- * Variable Global MAIN présente dans toutes 
+/* PROBLEME
+ * Variable Global MAIN présente dans toutes
  * les tables de symbôle, comment faire ???
 */
 
