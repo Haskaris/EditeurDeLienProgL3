@@ -42,4 +42,5 @@ int main(int argc, char *argv[]) {
 		fclose(elfFile2);
 		fclose(outputFile);
 	}
+	return 0;
 }

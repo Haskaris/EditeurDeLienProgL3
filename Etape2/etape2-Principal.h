@@ -13,8 +13,9 @@
 #include "../librairie/macro_symbole.h"
 #include "../librairie/macro_header.h"
 #include "../librairie/macro_repositionnement.h"
-
-/* Contient la fonction main qui se chargera d'appeler les
+//#include "../librairie/arbreBinaire.c"
+//#include "../librairie/arbreBinaire.h"
+/* Contient la fonction main qui se chargera d'appeler les 
  * fonctions voulues
 */
 #endif /* __ETAPE1_PRINCIPAL_H__ */

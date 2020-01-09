@@ -60,7 +60,7 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
 			printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section,section.sh_offset,nb_entree);
 			fseek(elfFile, section.sh_offset, SEEK_SET);
 			for (int i=0;i<nb_entree;i++){
-				fread(&rela,1,sizeof(rela),elfFile);
+				litEtInverse_Rela(elfFile, header, &rela);
 				printf("décalage : %012x  ", rela.r_offset);
 				printf("type : ");
 				afficher_relocation_type(ELF32_R_TYPE(rela.r_info));
@@ -78,7 +78,7 @@ void affichage_Table_Reimplantation(FILE *elfFile, Elf32_Ehdr header) {
 			printf("Section de réadressage '%s' à l'adresse de décalage 0x%04x contient %d entrées\n",nom_section,section.sh_offset,nb_entree);
 			fseek(elfFile, section.sh_offset, SEEK_SET);
 			for (int i=0;i<nb_entree;i++){
-				fread(&rel,1,sizeof(rel),elfFile);
+				litEtInverse_Rel(elfFile, header, &rel);
 				printf("décalage : %012x  ",rel.r_offset);
 				printf("type : ");
 				afficher_relocation_type(ELF32_R_TYPE(rel.r_info));
