@@ -1,8 +1,6 @@
 //Inclure les autres du .h ?
 #include "etape2-6.h"
 
-
-
 /*
  * A préciser / Changer pour get ?
  */
