@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
+//Pour le fusion header
 #include "etape2-6.h"
 #include "etape2-7.h"
-#include "etape2-8.h"
 
 int fusion_2_7(FILE * elfFile1, FILE * elfFile2, FILE * outputFile) {
 	//Permet de savoir si ça s'est bien passé ou non
@@ -131,7 +131,6 @@ void verificationSymboleGlobal(Elf32_Sym symbole, struct Noeud *ArbreVariableGlo
 	}
 }
 
-
 void ecritureSymbolGlobalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, Noeud *noeud){
 	if (noeud == NULL){
 		return ;
@@ -163,6 +162,9 @@ void ecritureSymbolLocalFichierElf(FILE* elfFileDest, Elf32_Shdr *section, struc
 	return;
 }
 
+/*
+ * Produit une erreur de segmentation
+ */
 int nombreSymbolGlobalFichierElf(Noeud *noeud, int indice){
 	if (noeud == NULL){
 		return indice;
@@ -289,14 +291,12 @@ int fusion_section_2_7(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_E
 		//Si une section de même nom et de même type a été trouvée
 		if (j < header2.e_shnum) {
 			if(section1.sh_type == SHT_SYMTAB) {
-				printf("Avant ici\n");
 				struct Noeud *ArbreVariableGlobal = malloc(sizeof(struct Noeud));
 				struct Liste *listeLocal = malloc(sizeof(struct Liste));
 				listeLocal->premier = NULL;
 
 				print_symbol_table32(elfFile1, header1, section1, i, ArbreVariableGlobal, listeLocal);
 				print_symbol_table32(elfFile2, header2, section2, j, ArbreVariableGlobal, listeLocal);
-				printf("111111111111111111111111\n");
 
 				sections_deja_fusionnees[j]=1;
 				renumerotation_section2[j]=i;
@@ -308,25 +308,20 @@ int fusion_section_2_7(FILE* elfFile1, FILE* elfFile2, FILE* outputFile, Elf32_E
 				sectionOut.sh_link = get_sh_link(sectionOut.sh_type, section1.sh_link,symtab_index);
 				sectionOut.sh_entsize = section1.sh_entsize;
 				sectionOut.sh_addralign = section1.sh_addralign;
-				printf("33333333333333333333\n");
 				int nombre_symbol =  tailleSectionTableSymbole(listeLocal, ArbreVariableGlobal);
-				printf("3.1111111111\n");
 				sectionOut.sh_info = nombre_symbol;
 				sectionOut.sh_size = nombre_symbol * sizeof(Elf32_Sym);
 				//On print la section
 
-				printf("44444444444444444444\n");
 				fwrite(&sectionOut,sizeof(sectionOut),1,outputFile);
 				//On sauvegarde la position du curseur
 				curseur = ftell(outputFile);
 				fseek(outputFile, sectionOut.sh_offset, SEEK_SET);
-				printf("55555555555555555555\n");
 				ecritureSymbolLocalFichierElf(outputFile, &sectionOut, listeLocal);
 				ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal->noeudGauche);
 				ecritureSymbolGlobalFichierElf(outputFile, &sectionOut, ArbreVariableGlobal->noeudDroit);
 				offset_actuel += sectionOut.sh_size;
 				fseek(outputFile, curseur, SEEK_SET); //On revient à la position initiale
-				printf("99999999999999999999\n");
 			} else {
 				sections_deja_fusionnees[j] = 1;
 				renumerotation_section2[j] = i;
